@@ -191,3 +191,5 @@ SWAGGER_SETTINGS = {
       }
    }
 }
+
+MAX_LENGTH = 150
