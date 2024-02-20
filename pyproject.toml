@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "yp_ambassador_crm"
+version = "0.1.0"
+description = ""
+authors = ["Constantine Nazarov <m-end-eleev@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10.7"
+flake8 = "^6.0.0"
+Django = "^4.2.5"
+djangorestframework = "^3.14.0"
+django-filter = "^23.3"
+drf-extra-fields = "^3.7.0"
+django-cors-headers = "^4.2.0"
+python-dotenv = "^1.0.0"
+psycopg2-binary = "^2.9.7"
+djoser = "^2.1.0"
+drf-yasg = "^1.21.7"
+gunicorn = "^21.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
