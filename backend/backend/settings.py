@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_extra_fields',
     'drf_yasg',
+    'api',
+    'ambassadors',
+    'users',
 ]
 
 MIDDLEWARE = [
