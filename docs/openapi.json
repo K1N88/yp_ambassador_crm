@@ -1,0 +1,1048 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Хакатон+. CRM-ситсема для управления взаимодействия с амбассадорами Яндекс Практикума - OpenAPI 3.0",
+    "description": "This is a CRM Yandex Ambassador Server based on the OpenAPI 3.0 specification.  You can find out more about\n\nSome useful links:\n- [",
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": [
+    {
+      "url": "localhost"
+    }
+  ],
+  "tags": [
+    {
+      "name": "ambassador",
+      "description": "Everything about your Ambassadors"
+    },
+    {
+      "name": "authorization",
+      "description": "Access to CRM"
+    },
+    {
+      "name": "content",
+      "description": "Everything about content of ambassadors"
+    },
+    {
+      "name": "merch",
+      "description": "Everything about merch"
+    },
+    {
+      "name": "report",
+      "description": "Importing Data"
+    }
+  ],
+  "paths": {
+    "/auth": {
+      "get": {
+        "tags": [
+          "authorization"
+        ],
+        "summary": "вход в ситсему",
+        "description": "база пользователей с дступом",
+        "operationId": "authManager",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "query",
+            "description": "credentials (данные УЗ)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь найден (доступ разрешен)"
+          },
+          "400": {
+            "description": "Не предоставлены credentials"
+          },
+          "403": {
+            "description": "Доступ запрещен"
+          }
+        }
+      }
+    },
+    "/ambassador": {
+      "post": {
+        "tags": [
+          "ambassador"
+        ],
+        "summary": "Создать амбассадора",
+        "description": "Добавить амбассадорв",
+        "operationId": "addAmbassador",
+        "requestBody": {
+          "description": "Создать амбассадора вручную",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ambassador"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Амбассадор добавлен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ambassador"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "ambassador"
+        ],
+        "description": "Посмотреть отфильтрованный список амбассадоров",
+        "operationId": "searchAmbassadors",
+        "parameters": [
+          {
+            "name": "ambassador filters",
+            "in": "query",
+            "description": "Object containing filters for the resource",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filter": {
+                  "$ref": "#/components/schemas/AmbasFilter"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ambassador"
+                  }
+                }
+              }
+            },
+            "description": "Список амбассадоров"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/ambassador/{id}": {
+      "get": {
+        "tags": [
+          "ambassador"
+        ],
+        "description": "Посмотреть карточку амбассадора",
+        "operationId": "checkAmbassador",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of Ambassador",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ambassador"
+                }
+              }
+            },
+            "description": "Карточка амбассадора"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ambassador"
+        ],
+        "description": "Редактирование данных амбассадора",
+        "operationId": "updateAmbassador",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Редактирование амбассадора",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ambassador"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Амбассадор обновлен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ambassador"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/ambassador/import": {
+      "post": {
+        "tags": [
+          "ambassador"
+        ],
+        "requestBody": {
+          "content": {
+            "application/xls": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Амбассадоры импортированы"
+          },
+          "400": {
+            "description": "Неверный формат данных"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/ambassador/{ambassadorId}/content": {
+      "get": {
+        "tags": [
+          "ambassador"
+        ],
+        "description": "Посмотреть весь контент амбассадора",
+        "operationId": "checkAllAmbassador",
+        "parameters": [
+          {
+            "name": "ambassadorId",
+            "in": "path",
+            "description": "ID of Ambassador",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Амбассадор",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Content"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/content": {
+      "get": {
+        "tags": [
+          "content"
+        ],
+        "description": "Посмотреть контент амбассадоров",
+        "operationId": "filterContent",
+        "parameters": [
+          {
+            "name": "ambassador filters",
+            "in": "query",
+            "description": "Object containing filters for the resource",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filter": {
+                  "$ref": "#/components/schemas/AmbasFilter"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Content"
+                  }
+                }
+              }
+            },
+            "description": "Список контента"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "content"
+        ],
+        "description": "Загрузка контента амбассадорв через Яндекс форму",
+        "operationId": "addContent",
+        "requestBody": {
+          "description": "Добавить контент",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Content"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Контент успешно добавлен"
+          },
+          "400": {
+            "description": "Неверный формат данных"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/ambassador/{ambassadorId}/content/{contentId}": {
+      "get": {
+        "tags": [
+          "ambassador"
+        ],
+        "parameters": [
+          {
+            "name": "ambassadorId",
+            "in": "path",
+            "description": "ID of Ambassador",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "contentId",
+            "in": "path",
+            "description": "ID of Content",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Открыт контент амбассадора",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Content"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "content"
+        ],
+        "parameters": [
+          {
+            "name": "ambassadorId",
+            "in": "path",
+            "description": "ID of Ambassador",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "contentId",
+            "in": "path",
+            "description": "ID of Content",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Удаление контента амбассадора",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Content"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "content"
+        ],
+        "description": "Изменение состояния контента амбассадора",
+        "operationId": "updateState",
+        "parameters": [
+          {
+            "name": "ambassadorId",
+            "in": "path",
+            "description": "ID of Ambassador",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "contentId",
+            "in": "path",
+            "description": "ID of Content",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Content"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "состояние обновлен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Content"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/merchandise": {
+      "get": {
+        "tags": [
+          "merch"
+        ],
+        "description": "Отправка мерча амбассадорам",
+        "operationId": "chooseMerch",
+        "parameters": [
+          {
+            "name": "ambassador filters",
+            "in": "query",
+            "description": "Object containing filters for the resource",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filter": {
+                  "$ref": "#/components/schemas/AmbasFilter"
+                }
+              }
+            }
+          },
+          {
+            "name": "merch status (sent/no)",
+            "in": "query",
+            "description": "Object containing filters for the resource",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filter": {
+                  "$ref": "#/components/schemas/MerchstatusSent"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Merch"
+                  }
+                }
+              }
+            },
+            "description": "Список мерча по амбассадорам"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/ambassador/{ambassadorId}/merchandise/{merchandiseId}": {
+      "put": {
+        "tags": [
+          "merch"
+        ],
+        "description": "Отправка мерча амбассадору",
+        "operationId": "sendMerch",
+        "parameters": [
+          {
+            "name": "ambassadorId",
+            "in": "path",
+            "description": "ID of Ambassador",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "merchandiseId",
+            "in": "path",
+            "description": "ID of Merch",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Merch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "мерч обновлен успешно",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Merch"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат запроса"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/merchandise/export": {
+      "get": {
+        "tags": [
+          "report"
+        ],
+        "responses": {
+          "200": {
+            "description": "мерч, отправленный амбассадорам, экспортирован",
+            "content": {
+              "application/xls": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/budget": {
+      "get": {
+        "tags": [
+          "budget"
+        ],
+        "description": "Смотреть что и на какую сумму было отправлено мерча амбассадору",
+        "operationId": "showMoney",
+        "parameters": [
+          {
+            "name": "Ambassador filters",
+            "in": "query",
+            "description": "Object containing filters for the resource",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filter": {
+                  "$ref": "#/components/schemas/AmbasFilter"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Budget"
+                  }
+                }
+              }
+            },
+            "description": "Список амбассадоров c затратами на мерч"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/ambassador/{ambassadorId}/budget": {
+      "get": {
+        "tags": [
+          "budget"
+        ],
+        "parameters": [
+          {
+            "name": "ambassadorId",
+            "in": "path",
+            "description": "ID of Ambassador",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "бюджет амбассадора",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Budget"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/budget/export": {
+      "get": {
+        "tags": [
+          "report"
+        ],
+        "responses": {
+          "200": {
+            "description": "Затраты по мерчу и амбассадорам экспортированы",
+            "content": {
+              "application/xls": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Ambassador": {
+        "type": "object",
+        "properties": {
+          "idAmbas": {
+            "type": "integer",
+            "format": "int64",
+            "example": 10
+          },
+          "nameAmbas": {
+            "type": "string",
+            "example": "Пупкин Василий Васильевич"
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "country": {
+            "type": "string",
+            "example": "Россия"
+          },
+          "address": {
+            "type": "string",
+            "example": "Университетская наб., 3"
+          },
+          "index": {
+            "type": "string",
+            "example": 190000
+          },
+          "email": {
+            "type": "string",
+            "example": "vladimir@gmail.com"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+7 999 211 01 01"
+          },
+          "telegramHandle": {
+            "type": "string",
+            "example": "vasyapupkin"
+          },
+          "education": {
+            "type": "string",
+            "example": "физик СПбГУ"
+          },
+          "job": {
+            "type": "string",
+            "example": "преподаватель в СПбГУ"
+          },
+          "aim": {
+            "type": "string",
+            "example": "Получение новой профессии, чтобы сменить работу"
+          },
+          "dateCreated": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "sizes": {
+            "$ref": "#/components/schemas/ClothesSizes"
+          },
+          "promocode": {
+            "type": "string"
+          },
+          "comment": {
+            "type": "string",
+            "example": "Я готов на все ради мерча"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "supervisor": {
+            "type": "string",
+            "example": null
+          }
+        }
+      },
+      "ClothesSizes": {
+        "type": "object",
+        "properties": {
+          "tshirt": {
+            "type": "string",
+            "enum": [
+              "XS",
+              "S",
+              "M",
+              "L",
+              "XL"
+            ],
+            "example": "M"
+          },
+          "shoes": {
+            "type": "string",
+            "example": 40
+          }
+        }
+      },
+      "Date": {
+        "type": "string",
+        "format": "date",
+        "description": "Дата добавления",
+        "example": "10.02.2024"
+      },
+      "Gender": {
+        "type": "string",
+        "enum": [
+          "м",
+          "ж"
+        ],
+        "example": "м"
+      },
+      "Program": {
+        "type": "string",
+        "enum": [
+          "Аналитик данных",
+          "Специалист по Data Science",
+          "Python-разработчик",
+          "Веб-разработчик",
+          "Инженер по тестированию (QA)",
+          "Ux/UI-дизайнер",
+          "Маркетинг",
+          "Графический дизайнер",
+          "Middle Python",
+          "C++",
+          "Инженер данных",
+          "IT-рекрутер",
+          "Управление",
+          "Английский",
+          "Критическое мышление",
+          "Рабочая коммуникация",
+          "Алгоритмы для разработчиков",
+          "Продуктовый дизайн",
+          "SQL для работы с данными и аналитики",
+          "Java-разработчик",
+          "Коммерческий иллюстратор",
+          "Фулстек разработчик",
+          "Продвинутый GO-разработчик",
+          "DevOps для эксплуатации и разработки",
+          "IOS-разработчик",
+          "Бизнес-аналитик",
+          "Продакт-менеджер для специалистов с опытом",
+          "Android-разработчик",
+          "Менеджер проектов"
+        ],
+        "example": "Java-разработчик"
+      },
+      "Status": {
+        "type": "string",
+        "enum": [
+          "Активный",
+          "Уточняется",
+          "На паузе",
+          "Не амбассадор"
+        ],
+        "example": "Активный"
+      },
+      "City": {
+        "type": "string",
+        "example": "Санкт-Петербург"
+      },
+      "AmbasFilter": {
+        "type": "object",
+        "properties": {
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "date": {
+            "$ref": "#/components/schemas/Date"
+          },
+          "program": {
+            "$ref": "#/components/schemas/Program"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "city": {
+            "$ref": "#/components/schemas/City"
+          }
+        }
+      },
+      "Content": {
+        "type": "object",
+        "properties": {
+          "idContent": {
+            "type": "string",
+            "example": 11
+          },
+          "nameAmbas": {
+            "type": "string",
+            "example": "Пупкин Василий Васильевич"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "Первый отзыв",
+              "Гайд",
+              "Послегайд"
+            ],
+            "example": "Гайд"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "Выполнено",
+              "Не выполнено"
+            ],
+            "example": "Выполнено"
+          },
+          "telegramHandle": {
+            "type": "string",
+            "example": "vasyapupkin"
+          },
+          "link": {
+            "type": "string",
+            "example": null
+          }
+        }
+      },
+      "Merch": {
+        "type": "object",
+        "properties": {
+          "nameAmbas": {
+            "type": "string",
+            "example": "Пупкин Василий Васильевич"
+          },
+          "idMerch": {
+            "type": "string",
+            "example": 12
+          },
+          "style": {
+            "type": "string",
+            "example": "толстовка"
+          },
+          "commentToLogist": {
+            "type": "string",
+            "example": "Комментарий вот такой"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "Первый отзыв",
+              "Гайд",
+              "Послегайд"
+            ]
+          },
+          "monthSent": {
+            "type": "string",
+            "description": "Месяц отправки мерча",
+            "example": "февраль"
+          },
+          "requestDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Дата формирования заявки на отправку",
+            "example": "20.02.2024"
+          },
+          "status": {
+            "$ref": "#/components/schemas/MerchstatusSent"
+          }
+        }
+      },
+      "MerchstatusSent": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "boolean",
+            "description": "статус отправки мерча",
+            "example": true
+          }
+        }
+      },
+      "Budget": {
+        "type": "object",
+        "properties": {
+          "nameAmbas": {
+            "type": "string",
+            "example": "Пупкин Василий Васильевич"
+          },
+          "period": {
+            "type": "string",
+            "format": "date",
+            "description": "Дата совершенного заказа",
+            "example": "20.02.2024"
+          },
+          "style": {
+            "type": "string",
+            "description": "вид мерча, который был отправлен амбассадору",
+            "example": "толстовка"
+          },
+          "price": {
+            "type": "string",
+            "description": "стоимость конкретного мерча (руб)",
+            "example": 1999
+          },
+          "sum": {
+            "type": "string",
+            "description": "сумма всего мерча, отправленная конкретному амбассадору",
+            "example": 1999
+          }
+        }
+      }
+    }
+  }
+}
