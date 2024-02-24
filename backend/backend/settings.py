@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'api',
     'ambassadors',
     'users',
+    'merch'
 ]
 
 MIDDLEWARE = [
@@ -101,6 +102,8 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT')
     }
 }
+
+
 
 
 # Password validation
@@ -193,3 +196,5 @@ SWAGGER_SETTINGS = {
 }
 
 MAX_LENGTH = 250
+NAME_MAX_LENGTH = 200
+COMMENT_MAX_LENGTH = 500
