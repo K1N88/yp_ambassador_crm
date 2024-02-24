@@ -3,9 +3,11 @@ from rest_framework import viewsets, mixins
 from rest_framework.permissions import SAFE_METHODS
 
 from api.serializers import (AmbassadorPostSerializer, AmbassadorSerializer,
-                             AmbassadorUpdateSerializer)
+                             AmbassadorUpdateSerializer, SupervisorSerializer,
+                             StudyProgrammSerializer)
 from api.filters import AmbassadorsFilter
-from ambassadors.models import Ambassadors
+from ambassadors.models import Ambassadors, StudyProgramm
+from users.models import CrmUser
 
 
 class AmbassadorsViewSet(
@@ -28,3 +30,21 @@ class AmbassadorsViewSet(
         elif self.request.method in ['PUT', 'PATCH']:
             return AmbassadorUpdateSerializer
         return AmbassadorPostSerializer
+
+
+class StudyProgrammViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    '''Обработчик для программ обучения'''
+    queryset = StudyProgramm.objects.all()
+    serializer_class = StudyProgrammSerializer
+
+
+class SupervisorViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    '''Обработчик для Кураторов'''
+    queryset = CrmUser.objects.all()
+    serializer_class = SupervisorSerializer

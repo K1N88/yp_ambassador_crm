@@ -1,7 +1,8 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from ambassadors.models import Ambassadors
+from ambassadors.models import Ambassadors, StudyProgramm
+from users.models import CrmUser
 
 
 class AmbassadorPostSerializer(serializers.ModelSerializer):
@@ -30,3 +31,19 @@ class AmbassadorUpdateSerializer(serializers.ModelSerializer):
         model = Ambassadors
         fields = ('blog_url', 'promocode', 'status', 'supervisor',
                   'supervisor_comment', 'contact_preferences')
+
+
+class SupervisorSerializer(serializers.ModelSerializer):
+    ''''Сериализатор для Кураторов'''
+
+    class Meta:
+        model = CrmUser
+        fields = ('id', 'name', 'username', 'surname', 'email')
+
+
+class StudyProgrammSerializer(serializers.ModelSerializer):
+    ''''Сериализатор для программ обучения'''
+
+    class Meta:
+        model = StudyProgramm
+        fields = '__all__'
