@@ -1,12 +1,12 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from api.views import AmbassadorsViewSet
-
+from api.views import AmbassadorsViewSet, ContentViewSet
 
 router = DefaultRouter()
 
-router.register('ambassadors', AmbassadorsViewSet)
+router.register('ambassadors', AmbassadorsViewSet, basename='ambassadors')
+router.register('content', ContentViewSet, basename='content')
 
 urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
