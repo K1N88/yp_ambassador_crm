@@ -1,14 +1,30 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, mixins
+from rest_framework.permissions import SAFE_METHODS
 
-from api.serializers import AmbassadorsSerializer
+from api.serializers import (AmbassadorPostSerializer, AmbassadorSerializer,
+                             AmbassadorUpdateSerializer)
+from api.filters import AmbassadorsFilter
 from ambassadors.models import Ambassadors
 
 
 class AmbassadorsViewSet(
     mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
     mixins.ListModelMixin,
     viewsets.GenericViewSet
 ):
-    '''Обработчик для магазинов'''
+    '''Обработчик для амбассадоров'''
     queryset = Ambassadors.objects.all()
-    serializer_class = AmbassadorsSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = AmbassadorsFilter
+    filterset_fields = ['study_programm', 'status', 'gender', 'country',
+                        'city', 'want_to_do', 'date_from', 'date_to',
+                        'supervisor']
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return AmbassadorSerializer
+        elif self.request.method in ['PUT', 'PATCH']:
+            return AmbassadorUpdateSerializer
+        return AmbassadorPostSerializer

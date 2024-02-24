@@ -12,7 +12,7 @@ class StudyProgramm(models.Model):
     title = models.CharField(max_length=settings.MAX_LENGTH)
 
     def __str__(self):
-        return {self.title}
+        return self.title
 
 
 class Ambassadors(models.Model):
@@ -35,8 +35,14 @@ class Ambassadors(models.Model):
         ("active", "Активный"),
         ("inactive", "Не активный")
     )
+    CONTACT_PREFERENCES = (
+        ("email", "email"),
+        ("phone", "phone"),
+        ("telegram", "telegram"),
+    )
 
-    date_created = models.DateField(verbose_name='дата регистрации')
+    date_created = models.DateField(verbose_name='дата регистрации',
+                                    auto_now_add=True)
 
     # поля яндекс формы
     surname = models.CharField(verbose_name='фамилия',
@@ -75,6 +81,9 @@ class Ambassadors(models.Model):
     supervisor = models.ForeignKey(CrmUser, null=True,
                                    on_delete=models.SET_NULL,
                                    related_name='ambassador_user')
+    supervisor_comment = models.TextField(null=True)
+    contact_preferences = models.CharField(null=True, max_length=8,
+                                           choices=CONTACT_PREFERENCES)
 
     class Meta:
         ordering = ('surname', 'name', 'patronymic', 'date_created')
