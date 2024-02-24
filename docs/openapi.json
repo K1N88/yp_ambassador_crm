@@ -2,12 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Хакатон+. CRM-ситсема для управления взаимодействия с амбассадорами Яндекс Практикума - OpenAPI 3.0",
-    "description": "This is a CRM Yandex Ambassador Server based on the OpenAPI 3.0 specification.  You can find out more about\n\nSome useful links:\n- [",
+    "description": "This is a CRM Yandex Ambassador Server based on the OpenAPI 3.0 specification.",
     "version": "1.0.0"
-  },
-  "externalDocs": {
-    "description": "Find out more about Swagger",
-    "url": "http://swagger.io"
   },
   "servers": [
     {
@@ -33,7 +29,7 @@
     },
     {
       "name": "report",
-      "description": "Importing Data"
+      "description": "Exporting Data"
     }
   ],
   "paths": {
@@ -110,20 +106,48 @@
         "tags": [
           "ambassador"
         ],
-        "description": "Посмотреть отфильтрованный список амбассадоров",
+        "description": "Посмотреть список амбассадоров (с возможными фильтрами)",
         "operationId": "searchAmbassadors",
         "parameters": [
           {
-            "name": "ambassador filters",
+            "name": "gender",
             "in": "query",
+            "required": false,
             "description": "Object containing filters for the resource",
             "schema": {
-              "type": "object",
-              "properties": {
-                "filter": {
-                  "$ref": "#/components/schemas/AmbasFilter"
-                }
-              }
+              "$ref": "#/components/schemas/Gender"
+            }
+          },
+          {
+            "name": "registrationDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "program",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Program"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Status"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/City"
             }
           }
         ],
@@ -278,7 +302,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Амбассадор",
+            "description": "Контент амбассадора просмотрен",
             "content": {
               "application/json": {
                 "schema": {
@@ -301,20 +325,48 @@
         "tags": [
           "content"
         ],
-        "description": "Посмотреть контент амбассадоров",
+        "description": "Посмотреть контент амбассадоров (с возможными фильтрами)",
         "operationId": "filterContent",
         "parameters": [
           {
-            "name": "ambassador filters",
+            "name": "gender",
             "in": "query",
+            "required": false,
             "description": "Object containing filters for the resource",
             "schema": {
-              "type": "object",
-              "properties": {
-                "filter": {
-                  "$ref": "#/components/schemas/AmbasFilter"
-                }
-              }
+              "$ref": "#/components/schemas/Gender"
+            }
+          },
+          {
+            "name": "registrationDate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "program",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Program"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Status"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/City"
             }
           }
         ],
@@ -371,6 +423,8 @@
         "tags": [
           "ambassador"
         ],
+        "description": "Посмотреть конкретный контент амбассадора",
+        "operationId": "checkContentAmbassador",
         "parameters": [
           {
             "name": "ambassadorId",
@@ -395,7 +449,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Открыт контент амбассадора",
+            "description": "Контент амбассадора",
             "content": {
               "application/json": {
                 "schema": {
@@ -437,7 +491,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Удаление контента амбассадора",
+            "description": "Контент амбассадора удален",
             "content": {
               "application/json": {
                 "schema": {
@@ -450,12 +504,14 @@
             "description": "Ошибка сервера"
           }
         }
-      },
+      }
+    },
+    "/ambassador/{ambassadorId}/contentStatus": {
       "put": {
         "tags": [
           "content"
         ],
-        "description": "Изменение состояния контента амбассадора",
+        "description": "Изменение статуса контента амбассадора",
         "operationId": "updateState",
         "parameters": [
           {
@@ -467,34 +523,24 @@
               "type": "integer",
               "format": "int64"
             }
-          },
-          {
-            "name": "contentId",
-            "in": "path",
-            "description": "ID of Content",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
           }
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Content"
+                "$ref": "#/components/schemas/ContentStatus"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "состояние обновлен",
+            "description": "состояние обновлено",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Content"
+                  "$ref": "#/components/schemas/ContentStatus"
                 }
               }
             }
@@ -507,33 +553,86 @@
         "tags": [
           "merch"
         ],
-        "description": "Отправка мерча амбассадорам",
+        "description": "Список мерча по амбассадорам для отправки",
         "operationId": "chooseMerch",
         "parameters": [
           {
-            "name": "ambassador filters",
+            "name": "gender",
             "in": "query",
-            "description": "Object containing filters for the resource",
+            "required": false,
+            "description": "Ambassador gender",
             "schema": {
-              "type": "object",
-              "properties": {
-                "filter": {
-                  "$ref": "#/components/schemas/AmbasFilter"
-                }
-              }
+              "$ref": "#/components/schemas/Gender"
             }
           },
           {
-            "name": "merch status (sent/no)",
+            "name": "registrationDate",
             "in": "query",
-            "description": "Object containing filters for the resource",
+            "required": false,
+            "description": "Ambassador registration date",
             "schema": {
-              "type": "object",
-              "properties": {
-                "filter": {
-                  "$ref": "#/components/schemas/MerchstatusSent"
-                }
-              }
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "program",
+            "in": "query",
+            "required": false,
+            "description": "Practicum course",
+            "schema": {
+              "$ref": "#/components/schemas/Program"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Ambassador status",
+            "schema": {
+              "$ref": "#/components/schemas/Status"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/City"
+            }
+          },
+          {
+            "name": "metchStyle",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/MerchStyle"
+            }
+          },
+          {
+            "name": "shipped",
+            "in": "query",
+            "required": false,
+            "description": "Merchandise status",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "shippedFrom",
+            "in": "query",
+            "required": false,
+            "description": "Date from when merch was shipped (included)",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "shippedTo",
+            "in": "query",
+            "required": false,
+            "description": "Date to when merch was shipped (excluded)",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
             }
           }
         ],
@@ -557,7 +656,7 @@
         }
       }
     },
-    "/ambassador/{ambassadorId}/merchandise/{merchandiseId}": {
+    "/ambassador/{ambassadorId}/merchandise/{merchandiseId}/state": {
       "put": {
         "tags": [
           "merch"
@@ -597,7 +696,7 @@
         },
         "responses": {
           "200": {
-            "description": "мерч обновлен успешно",
+            "description": "Статус отправки мерча обновлен успешно",
             "content": {
               "application/json": {
                 "schema": {
@@ -615,14 +714,86 @@
         }
       }
     },
-    "/merchandise/export": {
+    "/merchandise/excel": {
       "get": {
         "tags": [
           "report"
         ],
+        "parameters": [
+          {
+            "name": "gender",
+            "in": "query",
+            "required": false,
+            "description": "Ambassador gender",
+            "schema": {
+              "$ref": "#/components/schemas/Gender"
+            }
+          },
+          {
+            "name": "registrationDate",
+            "in": "query",
+            "required": false,
+            "description": "Ambassador registration date",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "program",
+            "in": "query",
+            "required": false,
+            "description": "Practicum course",
+            "schema": {
+              "$ref": "#/components/schemas/Program"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Ambassador status",
+            "schema": {
+              "$ref": "#/components/schemas/Status"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/City"
+            }
+          },
+          {
+            "name": "metchStyle",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/MerchStyle"
+            }
+          },
+          {
+            "name": "shippedFrom",
+            "in": "query",
+            "required": false,
+            "description": "Date from when merch was shipped (included)",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "shippedTo",
+            "in": "query",
+            "required": false,
+            "description": "Date to when merch was shipped (excluded)",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "мерч, отправленный амбассадорам, экспортирован",
+            "description": "Экспорт отправленного мерча в эксель",
             "content": {
               "application/xls": {
                 "schema": {
@@ -646,20 +817,86 @@
         "tags": [
           "budget"
         ],
-        "description": "Смотреть что и на какую сумму было отправлено мерча амбассадору",
+        "description": "Смотреть что и на какую сумму было отправлено мерча амбассадорам",
         "operationId": "showMoney",
         "parameters": [
           {
-            "name": "Ambassador filters",
+            "name": "gender",
             "in": "query",
-            "description": "Object containing filters for the resource",
+            "required": false,
+            "description": "Ambassador gender",
             "schema": {
-              "type": "object",
-              "properties": {
-                "filter": {
-                  "$ref": "#/components/schemas/AmbasFilter"
-                }
-              }
+              "$ref": "#/components/schemas/Gender"
+            }
+          },
+          {
+            "name": "registrationDate",
+            "in": "query",
+            "required": false,
+            "description": "Ambassador registration date",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "program",
+            "in": "query",
+            "required": false,
+            "description": "Practicum course",
+            "schema": {
+              "$ref": "#/components/schemas/Program"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Ambassador status",
+            "schema": {
+              "$ref": "#/components/schemas/Status"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/City"
+            }
+          },
+          {
+            "name": "metchStyle",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/MerchStyle"
+            }
+          },
+          {
+            "name": "shippedFrom",
+            "in": "query",
+            "required": false,
+            "description": "Date from when merch was shipped (included)",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "shippedTo",
+            "in": "query",
+            "required": false,
+            "description": "Date to when merch was shipped (excluded)",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "ambassadorName",
+            "in": "query",
+            "required": false,
+            "description": "Ambassador name",
+            "schema": {
+              "$ref": "#/components/schemas/AmbassadorName"
             }
           }
         ],
@@ -688,6 +925,7 @@
         "tags": [
           "budget"
         ],
+        "description": "бюджет потраченный на амбассадора",
         "parameters": [
           {
             "name": "ambassadorId",
@@ -717,14 +955,95 @@
         }
       }
     },
-    "/budget/export": {
+    "/budget/excel": {
       "get": {
         "tags": [
           "report"
         ],
+        "parameters": [
+          {
+            "name": "gender",
+            "in": "query",
+            "required": false,
+            "description": "Ambassador gender",
+            "schema": {
+              "$ref": "#/components/schemas/Gender"
+            }
+          },
+          {
+            "name": "registrationDate",
+            "in": "query",
+            "required": false,
+            "description": "Ambassador registration date",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "program",
+            "in": "query",
+            "required": false,
+            "description": "Practicum course",
+            "schema": {
+              "$ref": "#/components/schemas/Program"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Ambassador status",
+            "schema": {
+              "$ref": "#/components/schemas/Status"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/City"
+            }
+          },
+          {
+            "name": "metchStyle",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/MerchStyle"
+            }
+          },
+          {
+            "name": "shippedFrom",
+            "in": "query",
+            "required": false,
+            "description": "Date from when merch was shipped (included)",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "shippedTo",
+            "in": "query",
+            "required": false,
+            "description": "Date to when merch was shipped (excluded)",
+            "schema": {
+              "$ref": "#/components/schemas/Date"
+            }
+          },
+          {
+            "name": "ambassadorName",
+            "in": "query",
+            "required": false,
+            "description": "Ambassador name",
+            "schema": {
+              "$ref": "#/components/schemas/AmbassadorName"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Затраты по мерчу и амбассадорам экспортированы",
+            "description": "Экспорт затрат по мерчу и амбассадорам в эксель",
             "content": {
               "application/xls": {
                 "schema": {
@@ -749,14 +1068,13 @@
       "Ambassador": {
         "type": "object",
         "properties": {
-          "idAmbas": {
+          "id": {
             "type": "integer",
             "format": "int64",
             "example": 10
           },
-          "nameAmbas": {
-            "type": "string",
-            "example": "Пупкин Василий Васильевич"
+          "name": {
+            "$ref": "#/components/schemas/AmbassadorName"
           },
           "gender": {
             "$ref": "#/components/schemas/Gender"
@@ -813,11 +1131,31 @@
           "status": {
             "$ref": "#/components/schemas/Status"
           },
-          "supervisor": {
+          "contentStatus": {
+            "$ref": "#/components/schemas/ContentStatus"
+          },
+          "activity": {
             "type": "string",
-            "example": null
+            "enum": [
+              "Вести блог",
+              "Развивать локальное профессиональоне сообщество в своем городе",
+              "Писать статьи",
+              "Снимать видео или сниматься в них, если продакшн будет на нашей стороне",
+              "Знакомить коллег на работе с продуктом Практикума через различные форматы",
+              "Давать консультации и рассказывать всем про Практикум",
+              "Выступать на мероприятиях"
+            ],
+            "example": "Вести блог, Снимать видео или сниматься в них, если продакшн будет на нашей стороне"
+          },
+          "personalBlog": {
+            "type": "string",
+            "example": "pupkinmadeontilda.com"
           }
         }
+      },
+      "AmbassadorName": {
+        "type": "string",
+        "example": "Пупкин Василий Васильевич"
       },
       "ClothesSizes": {
         "type": "object",
@@ -842,7 +1180,7 @@
       "Date": {
         "type": "string",
         "format": "date",
-        "description": "Дата добавления",
+        "description": "Дата добавления амбассадора",
         "example": "10.02.2024"
       },
       "Gender": {
@@ -902,26 +1240,6 @@
         "type": "string",
         "example": "Санкт-Петербург"
       },
-      "AmbasFilter": {
-        "type": "object",
-        "properties": {
-          "gender": {
-            "$ref": "#/components/schemas/Gender"
-          },
-          "date": {
-            "$ref": "#/components/schemas/Date"
-          },
-          "program": {
-            "$ref": "#/components/schemas/Program"
-          },
-          "status": {
-            "$ref": "#/components/schemas/Status"
-          },
-          "city": {
-            "$ref": "#/components/schemas/City"
-          }
-        }
-      },
       "Content": {
         "type": "object",
         "properties": {
@@ -929,9 +1247,8 @@
             "type": "string",
             "example": 11
           },
-          "nameAmbas": {
-            "type": "string",
-            "example": "Пупкин Василий Васильевич"
+          "ambassadorName": {
+            "$ref": "#/components/schemas/AmbassadorName"
           },
           "kind": {
             "type": "string",
@@ -941,14 +1258,6 @@
               "Послегайд"
             ],
             "example": "Гайд"
-          },
-          "state": {
-            "type": "string",
-            "enum": [
-              "Выполнено",
-              "Не выполнено"
-            ],
-            "example": "Выполнено"
           },
           "telegramHandle": {
             "type": "string",
@@ -960,20 +1269,31 @@
           }
         }
       },
+      "ContentStatus": {
+        "type": "string",
+        "enum": [
+          "Выполнено",
+          "Не выполнено"
+        ],
+        "example": "Выполнено"
+      },
+      "MerchStyle": {
+        "type": "string",
+        "description": "название мерча",
+        "example": "толстовка"
+      },
       "Merch": {
         "type": "object",
         "properties": {
-          "nameAmbas": {
-            "type": "string",
-            "example": "Пупкин Василий Васильевич"
+          "ambassadorName": {
+            "$ref": "#/components/schemas/AmbassadorName"
           },
-          "idMerch": {
+          "id": {
             "type": "string",
             "example": 12
           },
           "style": {
-            "type": "string",
-            "example": "толстовка"
+            "$ref": "#/components/schemas/MerchStyle"
           },
           "commentToLogist": {
             "type": "string",
@@ -987,26 +1307,10 @@
               "Послегайд"
             ]
           },
-          "monthSent": {
-            "type": "string",
-            "description": "Месяц отправки мерча",
-            "example": "февраль"
-          },
           "requestDate": {
-            "type": "string",
-            "format": "date",
-            "description": "Дата формирования заявки на отправку",
-            "example": "20.02.2024"
+            "$ref": "#/components/schemas/Date"
           },
-          "status": {
-            "$ref": "#/components/schemas/MerchstatusSent"
-          }
-        }
-      },
-      "MerchstatusSent": {
-        "type": "object",
-        "properties": {
-          "state": {
+          "shipped": {
             "type": "boolean",
             "description": "статус отправки мерча",
             "example": true
@@ -1016,9 +1320,8 @@
       "Budget": {
         "type": "object",
         "properties": {
-          "nameAmbas": {
-            "type": "string",
-            "example": "Пупкин Василий Васильевич"
+          "ambassadorName": {
+            "$ref": "#/components/schemas/AmbassadorName"
           },
           "period": {
             "type": "string",
