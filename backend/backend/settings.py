@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'api',
     'ambassadors',
     'users',
+    'merch'
 ]
 
 MIDDLEWARE = [
@@ -101,6 +102,8 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT')
     }
 }
+
+
 
 
 # Password validation
