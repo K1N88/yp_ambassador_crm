@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from api.views import (AmbassadorsViewSet, BudgetViewSet, StudyProgrammViewSet,
                        SupervisorViewSet,)
-from merch.views import MerchandiseView
+from merch.views import MerchandiseView, SetStatusView
 
 router = DefaultRouter()
 
@@ -17,4 +17,6 @@ urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
     path('', include('djoser.urls')),
     path('api/', include(router.urls)),
+    path('api/ambassadors/<int:ambassadorId>/merchandise/<int:merchandiseId>/state',  # noqa
+         SetStatusView.as_view(), name='setstatus')
 ]

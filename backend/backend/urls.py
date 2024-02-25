@@ -36,5 +36,4 @@ urlpatterns = [
          name='schema-redoc'),
     path('admin/', admin.site.urls),
     path('', include('api.urls')),
-    path('', include('merch.urls')),
 ]
