@@ -5,6 +5,7 @@ from django.conf import settings
 import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -16,6 +17,13 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.CreateModel(
+            name='StudyProgramm',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('title', models.CharField(max_length=250)),
+            ],
+        ),
         migrations.CreateModel(
             name='Ambassadors',
             fields=[
@@ -44,6 +52,7 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(choices=[('active', 'Активный'), ('inactive', 'Не активный')], max_length=8, null=True)),
                 ('supervisor_comment', models.TextField(null=True)),
                 ('contact_preferences', models.CharField(choices=[('email', 'email'), ('phone', 'phone'), ('telegram', 'telegram')], max_length=8, null=True)),
+                ('study_programm', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='ambassador_programm', to='ambassadors.studyprogramm')),
             ],
             options={
                 'ordering': ('surname', 'name', 'patronymic', 'date_created'),
