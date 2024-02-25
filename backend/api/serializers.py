@@ -16,7 +16,7 @@ class ContentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content
-        fields = ('id',)
+        # fields = ('content_type',)
 
 
 class ContentListSerializer(serializers.ModelSerializer):
@@ -24,5 +24,44 @@ class ContentListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content
-        fields = ('ambassadorName', 'author', 'ingredients', 'is_favorited',)
+        # fields = ('full_name', 'telegram_handle', 'content_types',)
 
+
+# {
+#   [
+#     {
+#       "full_name": "Пупкин Василий Васильевич",
+#       "telegram_handle": "vasya_pupkin",
+#       "content_types": [
+#         {
+#           "title": "Первый отзыв",
+#           "status": "Выполнен",
+#           "content": [
+#               {
+#                   "link": "t.me/123"
+#               }
+#           ]
+#         },
+#         {
+#           "title": "Гайд",
+#           "status": "Выполнен",
+#           "content": [
+#               {
+#                   "link": "t.me/123"
+#               },
+#               {
+#                   "link": "t.me/123"
+#               },
+#               {
+#                   "link": "t.me/123"
+#               },
+#               {
+#                   "link": "t.me/123"
+#               },
+#           ]
+#         },
+#       ],
+
+#     }
+#   ]
+# }
