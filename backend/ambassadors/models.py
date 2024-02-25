@@ -88,27 +88,21 @@ class Ambassadors(models.Model):
     class Meta:
         ordering = ('surname', 'name', 'patronymic', 'date_created')
 
-
-class Content(models.Model):
-    '''Контент.'''
-    link = models.URLField()
-
-    def __str__(self):
-        return f"{self.link} for {self.ambassador.name}"
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Напиши __str__
 
 
 class ContentType(models.Model):
     '''Тип Контента.'''
 
     CONTENT_TYPES = [
-        ('отзыв', 'Отзыв'),
-        ('гайд', 'Гайд'),
-        ('после_гайда', 'После гайда'),
+        ('Первый отзыв', 'Первый отзыв'),
+        ('Гайд', 'Гайд'),
+        ('После гайда', 'После гайда'),
     ]
 
     CONTENT_STATUS = [
-        ('выполнено', 'Выполнено'),
-        ('не_выполнено', 'Не выполнено'),
+        ('Выполнено', 'Выполнено'),
+        ('Не выполнено', 'Не выполнено'),
     ]
 
     title = models.CharField(
@@ -117,12 +111,20 @@ class ContentType(models.Model):
         choices=CONTENT_TYPES
     )
     status = models.CharField(
-        max_length=10,
+        max_length=15,
         verbose_name="Статус контента",
-        choices=CONTENT_STATUS
+        choices=CONTENT_STATUS,
+        default='Не выполнено'
     )
-    ambassador = models.ForeignKey(Ambassadors, on_delete=models.CASCADE)
-    content = models.ForeignKey(Content, on_delete=models.CASCADE)
+    ambassador = models.ForeignKey(Ambassadors, on_delete=models.CASCADE, related_name='content_types',)
 
     def __str__(self):
         return f"{self.title} - {self.ambassador.name}"
+
+
+class Content(models.Model):
+    link = models.URLField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='contents', blank=True, null=True)
+
+    def __str__(self):
+        return self.link
