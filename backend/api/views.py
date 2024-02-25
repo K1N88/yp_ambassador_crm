@@ -93,8 +93,10 @@ class BudgetViewSet(
 
         font_style = xlwt.XFStyle()
 
-        rows = Budget.objects.all().values_list('ambassador__name', 'merch__date',
-                                                'merch__merch__name', 'merch__merch__cost')
+        rows = Budget.objects.all().values_list(
+            'ambassador__name', 'merch__date', 'merch__merch__name',
+            'merch__merch__cost'
+        )
         for row in rows:
             row_num += 1
             for col_num in range(len(row)):
