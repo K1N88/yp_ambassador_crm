@@ -36,7 +36,8 @@ class Ambassadors(models.Model):
         ("inactive", "Не активный")
     )
 
-    date_created = models.DateField(verbose_name='дата регистрации')
+    date_created = models.DateField(verbose_name='дата регистрации',
+                                    auto_now_add=True)
 
     # поля яндекс формы
     surname = models.CharField(verbose_name='фамилия',

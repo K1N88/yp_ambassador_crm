@@ -13,9 +13,20 @@ class MerchForSend(models.Model):
                                    related_name='merch_for_send',
                                    verbose_name='Амбассадор')
     merch = models.ForeignKey(Merch, on_delete=models.CASCADE,
-                                   related_name='merch_for_send',
+                                   related_name='merch_for_send_items',
                                    verbose_name='Мерч')
     count = models.IntegerField()
     date = models.DateField(auto_now_add=True) #Понять когда должна проставляться дата
     comment = models.CharField(max_length=COMMENT_MAX_LENGTH)
     shipped = models.BooleanField()
+
+
+class Budget(models.Model):
+    ambassador = models.ForeignKey(
+        Ambassadors, on_delete=models.CASCADE,
+        blank=True, null=True, related_name='ambassador'
+    )
+    merch = models.ForeignKey(
+        MerchForSend, on_delete=models.CASCADE,
+        blank=True, null=True, related_name='budget_merch'
+    )
