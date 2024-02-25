@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from api.views import (AmbassadorsViewSet, StudyProgrammViewSet,
-                       SupervisorViewSet)
+                       SupervisorViewSet, ContentViewSet)
 
 
 router = DefaultRouter()
@@ -10,6 +10,7 @@ router = DefaultRouter()
 router.register('ambassadors', AmbassadorsViewSet)
 router.register('supervisors', StudyProgrammViewSet)
 router.register('study_programms', SupervisorViewSet)
+router.register('content', ContentViewSet, basename='content')
 
 urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),

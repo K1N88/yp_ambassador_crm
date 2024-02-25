@@ -4,9 +4,9 @@ from rest_framework.permissions import SAFE_METHODS
 
 from api.serializers import (AmbassadorPostSerializer, AmbassadorSerializer,
                              AmbassadorUpdateSerializer, SupervisorSerializer,
-                             StudyProgrammSerializer)
+                             StudyProgrammSerializer, ContentListSerializer, ContentSerializer)
 from api.filters import AmbassadorsFilter
-from ambassadors.models import Ambassadors, StudyProgramm
+from ambassadors.models import Ambassadors, StudyProgramm, Content
 from users.models import CrmUser
 
 
@@ -48,3 +48,22 @@ class SupervisorViewSet(
     '''Обработчик для Кураторов'''
     queryset = CrmUser.objects.all()
     serializer_class = SupervisorSerializer
+
+
+class ContentViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    '''Обработчик для Контента'''
+
+    queryset = Content.objects.all()
+    serializer_class = ContentSerializer
+
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = None
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return ContentListSerializer
+        return ContentSerializer
