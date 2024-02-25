@@ -9,9 +9,9 @@ from rest_framework.permissions import SAFE_METHODS
 
 from api.serializers import (AmbassadorPostSerializer, AmbassadorSerializer,
                              AmbassadorUpdateSerializer, SupervisorSerializer,
-                             StudyProgrammSerializer, BudgetSerializer)
+                             StudyProgrammSerializer, BudgetSerializer, ContentListSerializer, ContentPostSerializer, ContentUpdateSerializer)
 from api.filters import AmbassadorsFilter
-from ambassadors.models import Ambassadors, StudyProgramm
+from ambassadors.models import Ambassadors, StudyProgramm, Content
 from merch.models import Budget
 from users.models import CrmUser
 
@@ -104,3 +104,23 @@ class BudgetViewSet(
 
         wb.save(response)
         return response
+
+
+class ContentViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    '''Обработчик для Контента'''
+
+    queryset = Content.objects.all()
+
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = None
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return ContentListSerializer
+        elif self.request.method in ['PUT', 'PATCH']:
+            return ContentUpdateSerializer
+        return ContentPostSerializer
