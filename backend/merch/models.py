@@ -4,9 +4,11 @@ from ambassadors.models import Ambassadors
 
 from backend.settings import NAME_MAX_LENGTH, COMMENT_MAX_LENGTH
 
+
 class Merch(models.Model):
     name = models.CharField(max_length=NAME_MAX_LENGTH)
     cost = models.IntegerField(validators=[MinValueValidator(1),])
+
 
 class MerchForSend(models.Model):
     ambassador = models.ForeignKey(Ambassadors, on_delete=models.CASCADE,
@@ -16,9 +18,10 @@ class MerchForSend(models.Model):
                                    related_name='merch_for_send_items',
                                    verbose_name='Мерч')
     count = models.IntegerField()
-    date = models.DateField(auto_now_add=True) #Понять когда должна проставляться дата
+    date = models.DateField(auto_now_add=True)
     comment = models.CharField(max_length=COMMENT_MAX_LENGTH)
     shipped = models.BooleanField()
+
 
 
 class Budget(models.Model):
