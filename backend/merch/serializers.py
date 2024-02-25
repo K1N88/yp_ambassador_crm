@@ -21,4 +21,4 @@ class MerchSerializer(serializers.ModelSerializer):
         # content = ambassador.content_set.get()
         # kind = content.content_type.name
         # return kind
-        pass
+        return obj
