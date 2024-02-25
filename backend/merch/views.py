@@ -1,14 +1,18 @@
 from rest_framework import mixins, viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import MerchForSend
 from .serializers import MerchSerializer
-from .filters import AmbassadorFilterBackend, MerchFilterBackend
+# from .filters import AmbassadorFilterBackend, MerchFilterBackend
+from .filters import MerchFilter 
 
 
 class MerchandiseView(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = MerchSerializer
-    filter_backends = [AmbassadorFilterBackend, MerchFilterBackend]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = MerchFilter 
 
     def get_queryset(self):
         return MerchForSend.objects.all()
