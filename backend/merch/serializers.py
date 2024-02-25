@@ -21,6 +21,7 @@ class MerchSerializer(serializers.ModelSerializer):
         # ambassador = obj.ambassador
         # content = ambassador.content_set.get()
         # kind = content.content_type.name
+        # return kind
         return obj
 
     def create(self, validated_data):
@@ -28,5 +29,4 @@ class MerchSerializer(serializers.ModelSerializer):
         merch_for_send_id = validated_data['id']
         ambassador = Ambassadors.objects.get(name=ambassadorName)
         Budget.objects.create(ambassador=ambassador.id, merch=merch_for_send_id)
-
         return super().create(validated_data)
