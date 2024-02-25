@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from ambassadors.models import Ambassadors, Budget
-from .models import MerchForSend
+from ambassadors.models import Ambassadors
+from .models import MerchForSend, Budget
 
 
 class MerchSerializer(serializers.ModelSerializer):

@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     'ambassadors',
     'users',
     'merch'
-    'merch'
 ]
 
 MIDDLEWARE = [

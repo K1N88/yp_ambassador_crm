@@ -1,5 +1,5 @@
-import io
-import pandas as pd
+import xlwt
+
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, mixins
@@ -9,9 +9,10 @@ from rest_framework.permissions import SAFE_METHODS
 
 from api.serializers import (AmbassadorPostSerializer, AmbassadorSerializer,
                              AmbassadorUpdateSerializer, SupervisorSerializer,
-                             StudyProgrammSerializer)
+                             StudyProgrammSerializer, BudgetSerializer)
 from api.filters import AmbassadorsFilter
 from ambassadors.models import Ambassadors, StudyProgramm
+from merch.models import Budget
 from users.models import CrmUser
 
 
@@ -36,6 +37,16 @@ class AmbassadorsViewSet(
             return AmbassadorUpdateSerializer
         return AmbassadorPostSerializer
 
+    @action(detail=True, methods=['get'])
+    def budget(self, request, pk=None):
+        '''Средства на амбассадора'''
+        ambassador = self.get_object()
+        budget = Budget.objects.filter(ambassador=ambassador)
+        print(budget)
+        serializer = BudgetSerializer(budget, many=True)
+
+        return Response(serializer.data)
+
 
 class StudyProgrammViewSet(
     mixins.ListModelMixin,
@@ -54,15 +65,6 @@ class SupervisorViewSet(
     queryset = CrmUser.objects.all()
     serializer_class = SupervisorSerializer
 
-    @action(detail=True, methods=['get'])
-    def budget(self, request, pk=None):
-        '''Средства на амбассадоре'''
-        ambassador = self.get_object()
-        budget = Budget.objects.filter(ambassador=ambassador)
-        serializer = BudgetSerializer(budget)
-
-        return Response(serializer.data)
-
 
 class BudgetViewSet(
     mixins.ListModelMixin,
@@ -71,19 +73,32 @@ class BudgetViewSet(
     queryset = Budget.objects.all()
     serializer_class = BudgetSerializer
 
-    @action(detail=True, methods=['get'])
-    def report_budget(request):
-        queryset = Budget.objects.all().order_by('ambassador')
-        data = pd.DataFrame(list(queryset.values()))
-        output = io.BytesIO()
-        writer = pd.ExcelWriter(output, engine='xlsxwriter')
-        data.to_excel(writer, sheet_name='Бюджет', index=False)
+    @action(detail=False, methods=['get'])
+    def excel(self, request):
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="budget.xls"'
 
-        writer.save()
-        output.seek(0)
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('Budget')
 
-        response = HttpResponse(
-            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-        response['Content-Disposition'] = 'attachment; filename=budget.xlsx'
+        row_num = 0
+
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
+
+        columns = ['Имя', 'Дата отправки', 'Тип мерча', 'Стоимость', ]
+
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num], font_style)
+
+        font_style = xlwt.XFStyle()
+
+        rows = Budget.objects.all().values_list('ambassador__name', 'merch__date',
+                                                'merch__merch__name', 'merch__merch__cost')
+        for row in rows:
+            row_num += 1
+            for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_style)
+
+        wb.save(response)
         return response
