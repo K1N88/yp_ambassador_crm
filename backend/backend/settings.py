@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'api',
     'ambassadors',
     'users',
+    'merch'
 ]
 
 MIDDLEWARE = [
@@ -108,6 +109,9 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -198,4 +202,6 @@ SWAGGER_SETTINGS = {
    }
 }
 
-MAX_LENGTH = 150
+MAX_LENGTH = 250
+NAME_MAX_LENGTH = 200
+COMMENT_MAX_LENGTH = 500

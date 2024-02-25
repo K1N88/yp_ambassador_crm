@@ -8,7 +8,7 @@ from users.validators import validate_username
 
 class CrmUser(AbstractUser):
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    REQUIRED_FIELDS = ['username', 'surname', 'name']
 
     username_validator = UnicodeUsernameValidator()
 
@@ -22,13 +22,18 @@ class CrmUser(AbstractUser):
         verbose_name='Логин пользователя',
         validators=[username_validator, validate_username],
     )
-    first_name = models.CharField(
-        max_length=settings.MAX_LENGTH,
-        verbose_name='Имя пользователя'
+    surname = models.CharField(
+        verbose_name='фамилия',
+        max_length=settings.MAX_LENGTH
     )
-    last_name = models.CharField(
-        max_length=settings.MAX_LENGTH,
-        verbose_name='Фамилия пользователя'
+    name = models.CharField(
+        verbose_name='имя',
+        max_length=settings.MAX_LENGTH
+    )
+    patronymic = models.CharField(
+        verbose_name='отчество',
+        null=True,
+        max_length=settings.MAX_LENGTH
     )
 
     class Meta:
@@ -43,4 +48,4 @@ class CrmUser(AbstractUser):
         ordering = ('username',)
 
     def __str__(self):
-        return self.username
+        return f'{self.name} {self.username} {self.surname}'

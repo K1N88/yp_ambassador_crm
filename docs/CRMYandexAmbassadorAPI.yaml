@@ -1,15 +1,8 @@
 openapi: 3.0.3
 info:
   title: Хакатон+. CRM-ситсема для управления взаимодействия с амбассадорами Яндекс Практикума - OpenAPI 3.0
-  description: |-
-    This is a CRM Yandex Ambassador Server based on the OpenAPI 3.0 specification.  You can find out more about
-    
-    Some useful links:
-    - [
+  description: This is a CRM Yandex Ambassador Server based on the OpenAPI 3.0 specification.
   version: 1.0.0
-externalDocs:
-  description: Find out more about Swagger
-  url: http://swagger.io
 servers:
   - url: localhost
 tags:
@@ -22,7 +15,7 @@ tags:
   - name: merch
     description: Everything about merch
   - name: report
-    description: Importing Data
+    description: Exporting Data
 paths:
   /auth:
     get:
@@ -72,17 +65,35 @@ paths:
     get:
       tags:
         - ambassador
-      description: Посмотреть отфильтрованный список амбассадоров
+      description: Посмотреть список амбассадоров (с возможными фильтрами)
       operationId: searchAmbassadors
       parameters:
-        - name: ambassador filters
+        - name: gender
           in: query
+          required: false
           description: Object containing filters for the resource
           schema:
-            type: object
-            properties:
-              filter:
-                $ref: '#/components/schemas/AmbasFilter'
+            $ref: '#/components/schemas/Gender'
+        - name: registrationDate
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: program
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Program'
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Status'
+        - name: city
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/City'
       responses:
         '200':
           content:
@@ -179,7 +190,7 @@ paths:
             format: int64
       responses:
         '200':
-          description: Амбассадор 
+          description: Контент амбассадора просмотрен
           content:
             application/json:
               schema:
@@ -192,17 +203,35 @@ paths:
     get:
       tags:
         - content
-      description: Посмотреть контент амбассадоров
+      description: Посмотреть контент амбассадоров (с возможными фильтрами)
       operationId: filterContent
       parameters:
-        - name: ambassador filters
+        - name: gender
           in: query
+          required: false
           description: Object containing filters for the resource
           schema:
-            type: object
-            properties:
-              filter:
-                $ref: '#/components/schemas/AmbasFilter'
+            $ref: '#/components/schemas/Gender'
+        - name: registrationDate
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: program
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Program'
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Status'
+        - name: city
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/City'
       responses:
         '200':
           content:
@@ -236,6 +265,8 @@ paths:
     get:
       tags:
         - ambassador
+      description: Посмотреть конкретный контент амбассадора
+      operationId: checkContentAmbassador
       parameters:
         - name: ambassadorId
           in: path
@@ -253,7 +284,7 @@ paths:
             format: int64
       responses:
         '200':
-          description: Открыт контент амбассадора
+          description: Контент амбассадора
           content:
             application/json:
               schema:
@@ -280,17 +311,18 @@ paths:
             format: int64
       responses: 
         '200':
-          description: Удаление контента амбассадора
+          description: Контент амбассадора удален
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Content'
         '500':
           description: Ошибка сервера
+  /ambassador/{ambassadorId}/contentStatus:
     put:
       tags:
         - content
-      description: Изменение состояния контента амбассадора
+      description: Изменение статуса контента амбассадора
       operationId: updateState
       parameters:
         - name: ambassadorId
@@ -300,48 +332,77 @@ paths:
           schema:
             type: integer
             format: int64
-        - name: contentId
-          in: path
-          description: ID of Content
-          required: true
-          schema:
-            type: integer
-            format: int64
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Content'
+              $ref: '#/components/schemas/ContentStatus'
       responses:
         '200':
-          description: состояние обновлен
+          description: состояние обновлено
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Content'
+                $ref: '#/components/schemas/ContentStatus'
   /merchandise:
     get:
       tags:
         - merch
-      description: Отправка мерча амбассадорам
+      description: Список мерча по амбассадорам для отправки
       operationId: chooseMerch
       parameters:
-        - name: ambassador filters
+        - name: gender
           in: query
-          description: Object containing filters for the resource
+          required: false
+          description: Ambassador gender
           schema:
-            type: object
-            properties:
-              filter:
-                $ref: '#/components/schemas/AmbasFilter'
-        - name: merch status (sent/no)
+            $ref: '#/components/schemas/Gender'
+        - name: registrationDate
           in: query
-          description: Object containing filters for the resource
+          required: false
+          description: Ambassador registration date
           schema:
-            type: object
-            properties:
-              filter:
-                $ref: '#/components/schemas/MerchstatusSent'
+            $ref: '#/components/schemas/Date'
+        - name: program
+          in: query
+          required: false
+          description: Practicum course
+          schema:
+            $ref: '#/components/schemas/Program'
+        - name: status
+          in: query
+          required: false
+          description: Ambassador status
+          schema:
+            $ref: '#/components/schemas/Status'
+        - name: city
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/City'
+        - name: metchStyle
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/MerchStyle'
+        - name: shipped
+          in: query
+          required: false
+          description: Merchandise status
+          schema:
+            type: boolean
+        - name: shippedFrom
+          in: query
+          required: false
+          description: Date from when merch was shipped (included)
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: shippedTo
+          in: query
+          required: false
+          description: Date to when merch was shipped (excluded)
+          schema:
+            $ref: '#/components/schemas/Date'
       responses:
         '200':
           content:
@@ -353,7 +414,7 @@ paths:
           description: Список мерча по амбассадорам
         '500':
           description: Ошибка сервера
-  /ambassador/{ambassadorId}/merchandise/{merchandiseId}:
+  /ambassador/{ambassadorId}/merchandise/{merchandiseId}/state:
     put:
       tags:
         - merch
@@ -381,7 +442,7 @@ paths:
               $ref: '#/components/schemas/Merch'
       responses:
         '200':
-          description: мерч обновлен успешно
+          description: Статус отправки мерча обновлен успешно
           content:
             application/json:
               schema:
@@ -390,13 +451,60 @@ paths:
           description: Неверный формат запроса
         '500':
           description: Ошибка сервера
-  /merchandise/export:
+  /merchandise/excel:
     get:
       tags:
         - report
+      parameters:
+        - name: gender
+          in: query
+          required: false
+          description: Ambassador gender
+          schema:
+            $ref: '#/components/schemas/Gender'
+        - name: registrationDate
+          in: query
+          required: false
+          description: Ambassador registration date
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: program
+          in: query
+          required: false
+          description: Practicum course
+          schema:
+            $ref: '#/components/schemas/Program'
+        - name: status
+          in: query
+          required: false
+          description: Ambassador status
+          schema:
+            $ref: '#/components/schemas/Status'
+        - name: city
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/City'
+        - name: metchStyle
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/MerchStyle'
+        - name: shippedFrom
+          in: query
+          required: false
+          description: Date from when merch was shipped (included)
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: shippedTo
+          in: query
+          required: false
+          description: Date to when merch was shipped (excluded)
+          schema:
+            $ref: '#/components/schemas/Date'
       responses:
         '200':
-          description: мерч, отправленный амбассадорам, экспортирован
+          description: Экспорт отправленного мерча в эксель
           content:
             application/xls:
               schema:
@@ -410,17 +518,61 @@ paths:
     get:
       tags:
         - budget
-      description: Смотреть что и на какую сумму было отправлено мерча амбассадору
+      description: Смотреть что и на какую сумму было отправлено мерча амбассадорам
       operationId: showMoney
       parameters:
-        - name: Ambassador filters
+        - name: gender
           in: query
-          description: Object containing filters for the resource
+          required: false
+          description: Ambassador gender
           schema:
-            type: object
-            properties:
-              filter:
-                $ref: '#/components/schemas/AmbasFilter'
+            $ref: '#/components/schemas/Gender'
+        - name: registrationDate
+          in: query
+          required: false
+          description: Ambassador registration date
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: program
+          in: query
+          required: false
+          description: Practicum course
+          schema:
+            $ref: '#/components/schemas/Program'
+        - name: status
+          in: query
+          required: false
+          description: Ambassador status
+          schema:
+            $ref: '#/components/schemas/Status'
+        - name: city
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/City'
+        - name: metchStyle
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/MerchStyle'
+        - name: shippedFrom
+          in: query
+          required: false
+          description: Date from when merch was shipped (included)
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: shippedTo
+          in: query
+          required: false
+          description: Date to when merch was shipped (excluded)
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: ambassadorName
+          in: query
+          required: false
+          description: Ambassador name
+          schema:
+            $ref: '#/components/schemas/AmbassadorName'
       responses:
         '200':
           content:
@@ -436,6 +588,7 @@ paths:
     get:
       tags:
         - budget
+      description: бюджет потраченный на амбассадора
       parameters:
         - name: ambassadorId
           in: path
@@ -453,13 +606,66 @@ paths:
                 $ref: '#/components/schemas/Budget'
         '500':
           description: Ошибка сервера  
-  /budget/export:
+  /budget/excel:
     get:
       tags:
         - report
+      parameters:
+        - name: gender
+          in: query
+          required: false
+          description: Ambassador gender
+          schema:
+            $ref: '#/components/schemas/Gender'
+        - name: registrationDate
+          in: query
+          required: false
+          description: Ambassador registration date
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: program
+          in: query
+          required: false
+          description: Practicum course
+          schema:
+            $ref: '#/components/schemas/Program'
+        - name: status
+          in: query
+          required: false
+          description: Ambassador status
+          schema:
+            $ref: '#/components/schemas/Status'
+        - name: city
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/City'
+        - name: metchStyle
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/MerchStyle'
+        - name: shippedFrom
+          in: query
+          required: false
+          description: Date from when merch was shipped (included)
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: shippedTo
+          in: query
+          required: false
+          description: Date to when merch was shipped (excluded)
+          schema:
+            $ref: '#/components/schemas/Date'
+        - name: ambassadorName
+          in: query
+          required: false
+          description: Ambassador name
+          schema:
+            $ref: '#/components/schemas/AmbassadorName'
       responses:
         '200':
-          description: Затраты по мерчу и амбассадорам экспортированы
+          description: Экспорт затрат по мерчу и амбассадорам в эксель
           content:
             application/xls:
               schema:
@@ -469,18 +675,18 @@ paths:
           description: Неверный формат данных
         '500':
           description: Внутренняя ошибка сервера
+
 components:
   schemas:
     Ambassador:
       type: object
       properties:
-        idAmbas:
+        id:
           type: integer
           format: int64
           example: 10
-        nameAmbas:
-          type: string
-          example: Пупкин Василий Васильевич
+        name:
+          $ref: '#/components/schemas/AmbassadorName'
         gender:
           $ref: '#/components/schemas/Gender'
         country: 
@@ -521,10 +727,26 @@ components:
           example: Я готов на все ради мерча
         status:
           $ref: '#/components/schemas/Status'
-        supervisor:
+        contentStatus: 
+          $ref: '#/components/schemas/ContentStatus'
+        activity:
           type: string
-          example: 
-   
+          enum:
+            - Вести блог
+            - Развивать локальное профессиональоне сообщество в своем городе
+            - Писать статьи
+            - Снимать видео или сниматься в них, если продакшн будет на нашей стороне
+            - Знакомить коллег на работе с продуктом Практикума через различные форматы
+            - Давать консультации и рассказывать всем про Практикум
+            - Выступать на мероприятиях
+          example: Вести блог, Снимать видео или сниматься в них, если продакшн будет на нашей стороне   
+        personalBlog:
+          type: string
+          example: pupkinmadeontilda.com
+    AmbassadorName:
+      type: string
+      example: Пупкин Василий Васильевич
+    
     ClothesSizes:
       type: object
       properties:
@@ -543,7 +765,7 @@ components:
     Date:
       type: string
       format: date
-      description: Дата добавления
+      description: Дата добавления амбассадора
       example: 10.02.2024
     Gender:
       type: string
@@ -595,29 +817,15 @@ components:
     City:
       type: string
       example: Санкт-Петербург
-    AmbasFilter:
-      type: object
-      properties:
-        gender:
-          $ref: '#/components/schemas/Gender'
-        date:
-          $ref: '#/components/schemas/Date'
-        program:
-          $ref: '#/components/schemas/Program'
-        status:
-          $ref: '#/components/schemas/Status'
-        city:
-          $ref: '#/components/schemas/City'
-        
+    
     Content:
       type: object
       properties:
         idContent:
           type: string
           example: 11
-        nameAmbas:
-          type: string
-          example: Пупкин Василий Васильевич
+        ambassadorName:
+          $ref: '#/components/schemas/AmbassadorName'
         kind: 
           type: string
           enum:
@@ -625,31 +833,33 @@ components:
             - Гайд
             - Послегайд
           example: Гайд
-        state:
-          type: string
-          enum:
-          - Выполнено
-          - Не выполнено
-          example: Выполнено
         telegramHandle: 
           type: string
           example: vasyapupkin
         link:
           type: string
           example: 
-    
+    ContentStatus:
+      type: string
+      enum:
+        - Выполнено
+        - Не выполнено
+      example: Выполнено  
+    MerchStyle:
+      type: string
+      description: название мерча
+      example: толстовка
+      
     Merch:
       type: object
       properties:
-        nameAmbas:
-          type: string
-          example: Пупкин Василий Васильевич
-        idMerch:
+        ambassadorName:
+          $ref: '#/components/schemas/AmbassadorName'
+        id:
           type: string
           example: 12
         style:
-          type: string
-          example: толстовка
+          $ref: '#/components/schemas/MerchStyle'
         commentToLogist:
           type: string
           example: Комментарий вот такой
@@ -659,32 +869,17 @@ components:
             - Первый отзыв
             - Гайд
             - Послегайд
-        monthSent:
-          type: string
-          description: Месяц отправки мерча
-          example: февраль
         requestDate:
-          type: string
-          format: date
-          description: Дата формирования заявки на отправку
-          example: 20.02.2024
-        status:
-          $ref: '#/components/schemas/MerchstatusSent'
-        
-    MerchstatusSent:
-      type: object
-      properties:
-        state:
+          $ref: '#/components/schemas/Date'
+        shipped:
           type: boolean
           description: статус отправки мерча
           example: true
-   
     Budget:
       type: object
       properties:
-        nameAmbas:
-          type: string
-          example: Пупкин Василий Васильевич
+        ambassadorName:
+          $ref: '#/components/schemas/AmbassadorName'
         period:
           type: string
           format: date
