@@ -87,3 +87,44 @@ class Ambassadors(models.Model):
 
     class Meta:
         ordering = ('surname', 'name', 'patronymic', 'date_created')
+
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Напиши __str__
+
+
+class ContentType(models.Model):
+    '''Тип Контента.'''
+
+    CONTENT_TYPES = [
+        ('Первый отзыв', 'Первый отзыв'),
+        ('Гайд', 'Гайд'),
+        ('После гайда', 'После гайда'),
+    ]
+
+    CONTENT_STATUS = [
+        ('Выполнено', 'Выполнено'),
+        ('Не выполнено', 'Не выполнено'),
+    ]
+
+    title = models.CharField(
+        max_length=15,
+        verbose_name="Название контента",
+        choices=CONTENT_TYPES
+    )
+    status = models.CharField(
+        max_length=15,
+        verbose_name="Статус контента",
+        choices=CONTENT_STATUS,
+        default='Не выполнено'
+    )
+    ambassador = models.ForeignKey(Ambassadors, on_delete=models.CASCADE, related_name='content_types',)
+
+    def __str__(self):
+        return f"{self.title} - {self.ambassador.name}"
+
+
+class Content(models.Model):
+    link = models.URLField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='contents', blank=True, null=True)
+
+    def __str__(self):
+        return self.link
