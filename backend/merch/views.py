@@ -3,12 +3,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import MerchForSend
 from .serializers import MerchSerializer
+from .filters import AmbassadorFilterBackend, MerchFilterBackend
 
 
 class MerchandiseView(viewsets.GenericViewSet, mixins.ListModelMixin):
-    queryset = MerchForSend.objects.all()
     serializer_class = MerchSerializer
+    filter_backends = [AmbassadorFilterBackend, MerchFilterBackend]
 
+    def get_queryset(self):
+        return MerchForSend.objects.all()
 
 class SetStatusView(APIView):
     def put(self, request, ambassadorId, merchandiseId):
