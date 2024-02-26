@@ -1,10 +1,11 @@
-from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.db.models import Count, Sum
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from ambassadors.models import Ambassadors, StudyProgramm, Content, ContentType
+from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
+from merch.models import Budget, MerchForSend
 from users.models import CrmUser
-from merch.models import MerchForSend, Budget
 
 
 class AmbassadorPostSerializer(serializers.ModelSerializer):
@@ -109,8 +110,10 @@ class ContentTypeSerializer(serializers.ModelSerializer):
 
 class ContentListSerializer(serializers.ModelSerializer):
     ''''Сериализатор для модели "Контент" запроса GET(list).'''
-    ambassadorName = serializers.CharField(source='content_type.ambassador.name')
-    telegramHandle = serializers.CharField(source='content_type.ambassador.telegram_handle', read_only=True)
+    ambassadorName = serializers.CharField(
+        source='content_type.ambassador.name')
+    telegramHandle = serializers.CharField(
+        source='content_type.ambassador.telegram_handle', read_only=True)
     # content_types = ContentTypeSerializer(many=True, read_only=True)
 
     class Meta:
@@ -118,7 +121,8 @@ class ContentListSerializer(serializers.ModelSerializer):
         # fields = ('ambassadorName', 'telegramHandle', 'content_types',)
         fields = ('ambassadorName', 'telegramHandle')
 
-    #FIXME
+    # FIXME
+
 
 class ContentPostSerializer(serializers.ModelSerializer):
     ''''Сериализатор для модели "Контент" запроса POST.'''
@@ -145,14 +149,27 @@ class ContentPostSerializer(serializers.ModelSerializer):
             )
         except Ambassadors.DoesNotExist:
             raise serializers.ValidationError(
-                f'Некорректное имя/фамилия/тг ссылка Амбассадора!'
+                'Некорректное имя/фамилия/тг ссылка Амбассадора!'
             )
 
-        is_first_content = ContentType.objects.filter(
-            ambassador=ambassador).count() == 0
+        # Количество всего контента амбассадора
+        content_count = ambassador.content_types.annotate(
+            total_content=Count('contents')
+        ).aggregate(total=Sum('total_content'))['total'] or 0
 
-        if is_first_content:
+        # Количество контента в Гайде амбассадора
+        guide_content_count = ambassador.content_types.filter(
+            title='Гайд'
+        ).annotate(
+            total_content=Count('contents')
+        ).values_list('total_content', flat=True).first() or 0
+
+        if content_count == 0:
             content_type_title = 'Первый отзыв'
+        elif is_guide and guide_content_count >= 5:
+            raise serializers.ValidationError(
+                'Поле «Ссылки по гайду» может размещать только до пяти ссылок!'
+            )
         elif is_guide:
             content_type_title = 'Гайд'
         else:
@@ -169,5 +186,3 @@ class ContentPostSerializer(serializers.ModelSerializer):
         )
 
         return content
-
-
