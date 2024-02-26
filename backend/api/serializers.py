@@ -1,8 +1,10 @@
 from django.conf import settings
-from django.db.models import Count, Sum
 from django.shortcuts import get_object_or_404
+from django.db.models import Count, Sum
 from rest_framework import serializers
 
+from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
+from merch.models import Budget, MerchForSend
 from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
 from merch.models import Budget, MerchForSend
 from users.models import CrmUser
@@ -90,38 +92,45 @@ class ContentUpdateSerializer(serializers.ModelSerializer):
         fields = ('id',)
 
 
-class ContentItemSerializer(serializers.ModelSerializer):
-    '''Сериализатор для модели "Контент" внутри ContentType.'''
-
-    class Meta:
-        model = Content
-        fields = ('link', )
-
-
 class ContentTypeSerializer(serializers.ModelSerializer):
     '''Сериализатор для модели "Тип Контента" в ContentListSerializer.'''
 
-    content = ContentItemSerializer(many=True, read_only=True)
+    contents = serializers.SerializerMethodField()
 
     class Meta:
         model = ContentType
-        fields = ('title', 'status', 'content')
+        fields = ('title', 'status', 'contents')
+
+    def get_contents(self, obj):
+        contents = obj.contents.all()
+        serialized_contents = [
+            {"link": content.link}
+            for content in contents
+        ]
+
+        return serialized_contents
 
 
 class ContentListSerializer(serializers.ModelSerializer):
     ''''Сериализатор для модели "Контент" запроса GET(list).'''
-    ambassadorName = serializers.CharField(
-        source='content_type.ambassador.name')
+
+    ambassadorName = serializers.SerializerMethodField(read_only=True)
     telegramHandle = serializers.CharField(
-        source='content_type.ambassador.telegram_handle', read_only=True)
-    # content_types = ContentTypeSerializer(many=True, read_only=True)
+        source='telegram_handle', read_only=True
+    )
+    content_types = ContentTypeSerializer(
+        many=True, read_only=True
+    )
 
     class Meta:
-        model = Content
-        # fields = ('ambassadorName', 'telegramHandle', 'content_types',)
-        fields = ('ambassadorName', 'telegramHandle')
+        model = Ambassadors
+        fields = ('ambassadorName', 'telegramHandle', 'content_types',)
 
-    # FIXME
+    def get_ambassadorName(self, obj):
+        full_name = ' '.join(
+            [obj.name, obj.surname, obj.patronymic]
+        )
+        return full_name
 
 
 class ContentPostSerializer(serializers.ModelSerializer):
