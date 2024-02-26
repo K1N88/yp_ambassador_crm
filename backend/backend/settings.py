@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_extra_fields',
     'drf_yasg',
+    'dbbackup',
     'api',
     'ambassadors',
     'users',
@@ -203,3 +204,16 @@ SWAGGER_SETTINGS = {
 MAX_LENGTH = 250
 NAME_MAX_LENGTH = 200
 COMMENT_MAX_LENGTH = 500
+
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_PORT = os.getenv('REDIS_PORT')
+
+CELERY_BROKER_URL = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
+CELERY_BROKER_TRANSPORT_OPTIONS = {"visibility_timeout": 3600}
+CELERY_RESULT_BACKEND = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
+
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': '/backup/'}
+
+DBBACKUP_CLEANUP_KEEP = 30
+DBBACKUP_CLEANUP_KEEP_MEDIA = 30
