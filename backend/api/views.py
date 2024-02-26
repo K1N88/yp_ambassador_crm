@@ -1,17 +1,18 @@
 import xlwt
-
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, mixins
+from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.permissions import SAFE_METHODS
+from rest_framework.response import Response
 
-from api.serializers import (AmbassadorPostSerializer, AmbassadorSerializer,
-                             AmbassadorUpdateSerializer, SupervisorSerializer,
-                             StudyProgrammSerializer, BudgetSerializer, ContentListSerializer, ContentPostSerializer, ContentUpdateSerializer)
+from ambassadors.models import Ambassadors, Content, StudyProgramm
 from api.filters import AmbassadorsFilter
-from ambassadors.models import Ambassadors, StudyProgramm, Content
+from api.serializers import (AmbassadorPostSerializer, AmbassadorSerializer,
+                             AmbassadorUpdateSerializer, BudgetSerializer,
+                             ContentListSerializer, ContentPostSerializer,
+                             ContentUpdateSerializer, StudyProgrammSerializer,
+                             SupervisorSerializer)
 from merch.models import Budget
 from users.models import CrmUser
 
@@ -113,14 +114,17 @@ class ContentViewSet(
 ):
     '''Обработчик для Контента'''
 
-    queryset = Content.objects.all()
-
     filter_backends = (DjangoFilterBackend,)
-    filterset_class = None
+    filterset_class = AmbassadorsFilter
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return ContentListSerializer
         elif self.request.method in ['PUT', 'PATCH']:
-            return ContentUpdateSerializer
+            return ContentUpdateSerializer  # Доб. update в сер. ниже?
         return ContentPostSerializer
+
+    def get_queryset(self):
+        if self.request.method in SAFE_METHODS:
+            return Ambassadors.objects.all()
+        return Content.objects.all()
