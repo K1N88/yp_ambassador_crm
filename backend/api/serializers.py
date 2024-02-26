@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.db.models import Count, Sum
 from rest_framework import serializers
 
+from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
+from merch.models import Budget, MerchForSend
 from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
 from merch.models import Budget, MerchForSend
 from users.models import CrmUser
@@ -158,11 +161,24 @@ class ContentPostSerializer(serializers.ModelSerializer):
                 'Некорректное имя/фамилия/тг ссылка Амбассадора!'
             )
 
-        is_first_content = ContentType.objects.filter(
-            ambassador=ambassador).count() == 0
+        # Количество всего контента амбассадора
+        content_count = ambassador.content_types.annotate(
+            total_content=Count('contents')
+        ).aggregate(total=Sum('total_content'))['total'] or 0
 
-        if is_first_content:
+        # Количество контента в Гайде амбассадора
+        guide_content_count = ambassador.content_types.filter(
+            title='Гайд'
+        ).annotate(
+            total_content=Count('contents')
+        ).values_list('total_content', flat=True).first() or 0
+
+        if content_count == 0:
             content_type_title = 'Первый отзыв'
+        elif is_guide and guide_content_count >= 5:
+            raise serializers.ValidationError(
+                'Поле «Ссылки по гайду» может размещать только до пяти ссылок!'
+            )
         elif is_guide:
             content_type_title = 'Гайд'
         else:
