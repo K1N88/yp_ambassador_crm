@@ -42,6 +42,8 @@ services:
 
   worker:
     image: k1n8/crm_app:latest
+    volumes:
+      - static_value:/crm_app/staticfiles/
     env_file:
       - ../.env
     command: poetry run celery -A backend worker -l info
@@ -52,6 +54,8 @@ services:
 
   beat:
     image: k1n8/crm_app:latest
+    volumes:
+      - static_value:/crm_app/staticfiles/
     env_file:
       - ../.env
     command: poetry run celery -A backend beat -l info
