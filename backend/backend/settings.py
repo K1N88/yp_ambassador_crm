@@ -213,7 +213,7 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {"visibility_timeout": 3600}
 CELERY_RESULT_BACKEND = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
 
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': '/backup/'}
+DBBACKUP_STORAGE_OPTIONS = {'location': '/root/crm_app/backup/'}
 
 DBBACKUP_CLEANUP_KEEP = 30
 DBBACKUP_CLEANUP_KEEP_MEDIA = 30
