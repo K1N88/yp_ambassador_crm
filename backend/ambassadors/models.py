@@ -1,6 +1,6 @@
-from django.db import models
 from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 from ambassadors.validators import (validate_index, validate_phone,
                                     validate_tg_handle)
@@ -116,7 +116,11 @@ class ContentType(models.Model):
         choices=CONTENT_STATUS,
         default='Не выполнено'
     )
-    ambassador = models.ForeignKey(Ambassadors, on_delete=models.CASCADE, related_name='content_types',)
+    ambassador = models.ForeignKey(
+        Ambassadors,
+        on_delete=models.CASCADE,
+        related_name='content_types',
+    )
 
     def __str__(self):
         return f"{self.title} - {self.ambassador.name}"
@@ -124,7 +128,13 @@ class ContentType(models.Model):
 
 class Content(models.Model):
     link = models.URLField()
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='contents', blank=True, null=True)
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        related_name='contents',
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return self.link
