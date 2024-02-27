@@ -1,12 +1,13 @@
 import xlwt
+from django.db.models import Count
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 
-from ambassadors.models import Ambassadors, Content, StudyProgramm
+from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
 from api.filters import AmbassadorsFilter
 from api.serializers import (AmbassadorPostSerializer, AmbassadorSerializer,
                              AmbassadorUpdateSerializer, BudgetSerializer,
@@ -32,6 +33,8 @@ class AmbassadorsViewSet(
                         'supervisor']
 
     def get_serializer_class(self):
+        if self.action == 'update_content_status':
+            return ContentUpdateSerializer
         if self.request.method in SAFE_METHODS:
             return AmbassadorSerializer
         elif self.request.method in ['PUT', 'PATCH']:
@@ -47,6 +50,32 @@ class AmbassadorsViewSet(
         serializer = BudgetSerializer(budget, many=True)
 
         return Response(serializer.data)
+
+    @action(detail=True, methods=['put', 'patch'], url_path='contentStatus')
+    def update_content_status(self, request, pk=None):
+        '''Обновление статуса контента для амбассадора.'''
+
+        title = request.data.get('title')
+        try:
+            content_type = ContentType.objects.get(
+                ambassador=self.get_object(),
+                title=title
+            )
+            serializer = ContentUpdateSerializer(
+                content_type, data=request.data
+            )
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+
+        except ContentType.DoesNotExist:
+            return Response(
+                {'error': 'Тип контента с указанным названием не найден, ' +
+                 f'либо Пользователь еще не дошел до "{title}"'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StudyProgrammViewSet(
@@ -120,11 +149,11 @@ class ContentViewSet(
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return ContentListSerializer
-        elif self.request.method in ['PUT', 'PATCH']:
-            return ContentUpdateSerializer  # Доб. update в сер. ниже?
         return ContentPostSerializer
 
     def get_queryset(self):
         if self.request.method in SAFE_METHODS:
-            return Ambassadors.objects.all()
+            return Ambassadors.objects.annotate(
+                content_count=Count('content_types__contents')
+            ).filter(content_count__gt=0)
         return Content.objects.all()
