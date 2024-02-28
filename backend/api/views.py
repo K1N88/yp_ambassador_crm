@@ -11,7 +11,7 @@ from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
 from api.filters import AmbassadorsFilter
 from api.serializers import (AmbassadorPostSerializer, AmbassadorSerializer,
                              AmbassadorUpdateSerializer, BudgetSerializer,
-                             ContentListSerializer, ContentPostDelSerializer,
+                             ContentListSerializer, ContentPostSerializer,
                              ContentUpdateSerializer, StudyProgrammSerializer,
                              SupervisorSerializer)
 from merch.models import Budget
@@ -182,7 +182,7 @@ class ContentViewSet(
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return ContentListSerializer
-        return ContentPostDelSerializer
+        return ContentPostSerializer
 
     def get_queryset(self):
         if self.request.method in SAFE_METHODS:

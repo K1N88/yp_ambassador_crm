@@ -160,7 +160,7 @@ class ContentListSerializer(serializers.ModelSerializer):
         return full_name
 
 
-class ContentPostDelSerializer(serializers.ModelSerializer):
+class ContentPostSerializer(serializers.ModelSerializer):
     ''''Сериализатор для модели "Контент" запросов POST и DEL.'''
 
     ambassadorName = serializers.CharField(write_only=True)
