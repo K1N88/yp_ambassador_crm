@@ -51,7 +51,11 @@ class AmbassadorsViewSet(
 
         return Response(serializer.data)
 
-    @action(detail=True, methods=['put', 'patch'], url_path='contentStatus')
+    @action(
+        detail=True,
+        methods=['put', 'patch'],
+        url_path='contentStatus'
+    )
     def update_content_status(self, request, pk=None):
         '''Обновление статуса контента для амбассадора.'''
 
@@ -76,6 +80,35 @@ class AmbassadorsViewSet(
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        detail=True,
+        methods=['delete'],
+        url_path=r'content/(?P<content_id>\d+)'
+    )
+    def delete_content(self, request, pk=None, content_id=None):
+        '''Удаление контента для амбассадора.'''
+
+        ambassador = self.get_object()
+        try:
+            Content.objects.get(
+                id=content_id,
+                content_type__ambassador=ambassador
+            ).delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Content.DoesNotExist:
+            return Response(
+                {'error': 'Контент с указанным ID не найден, ' +
+                 'Проверьте корректность ввода ContentId'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class StudyProgrammViewSet(

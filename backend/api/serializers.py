@@ -82,9 +82,20 @@ class BudgetSerializer(serializers.Serializer):
 
 
 class ContentUpdateSerializer(serializers.ModelSerializer):
+    '''Сериализатор для обновления Контента.'''
+
+    ambassadorName = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = ContentType
-        fields = ('title', 'status')
+        fields = ('ambassadorName', 'title', 'status')
+
+    def get_ambassadorName(self, obj):
+        ambassador = obj.ambassador
+        full_name = ' '.join(
+            [ambassador.surname, ambassador.name, ambassador.patronymic]
+        )
+        return full_name
 
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
@@ -101,7 +112,9 @@ class ContentUpdateSerializer(serializers.ModelSerializer):
                 'Необходимо указать `status` и `title` в теле запроса'
             )
 
-        if title_status not in [*ContentType.CONTENT_TYPES]:
+        if title_status not in [
+            item for sublist in ContentType.CONTENT_TYPES for item in sublist
+        ]:
             raise serializers.ValidationError(
                 'Укажите корректное значение `title`'
             )
@@ -113,16 +126,16 @@ class ContentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content
-        fields = ('link',)
+        fields = ('id', 'link',)
 
 
 class ContentTypeSerializer(serializers.ModelSerializer):
     '''Сериализатор для модели "Тип Контента".'''
-    content = ContentSerializer(many=True, read_only=True)
+    contents = ContentSerializer(read_only=True, many=True)
 
     class Meta:
         model = ContentType
-        fields = ('title', 'status', 'content')
+        fields = ('title', 'status', 'contents',)
 
 
 class ContentListSerializer(serializers.ModelSerializer):
@@ -148,7 +161,7 @@ class ContentListSerializer(serializers.ModelSerializer):
 
 
 class ContentPostSerializer(serializers.ModelSerializer):
-    ''''Сериализатор для модели "Контент" запроса POST.'''
+    ''''Сериализатор для модели "Контент" запросов POST и DEL.'''
 
     ambassadorName = serializers.CharField(write_only=True)
     telegramHandle = serializers.CharField(write_only=True)

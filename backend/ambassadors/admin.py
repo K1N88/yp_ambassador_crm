@@ -19,12 +19,12 @@ class AmbassadorsAdmin(admin.ModelAdmin):
 
 @admin.register(Content)
 class ContentAdmin(admin.ModelAdmin):
-    list_display = ('link',)
+    list_display = ('id', 'link',)
 
 
 @admin.register(ContentType)
 class ContentTypeAdmin(admin.ModelAdmin):
-    list_display = ('title', 'status', 'ambassador', 'contents')
+    list_display = ('id', 'title', 'status', 'ambassador', 'contents')
     list_filter = ('title', 'status', 'ambassador')
     search_fields = ('title', 'status', 'ambassador__name')
 
