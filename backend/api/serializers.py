@@ -169,7 +169,7 @@ class ContentPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content
-        fields = ('ambassadorName', 'telegramHandle', 'link', 'is_guide')
+        fields = ('ambassadorName', 'telegramHandle', 'link', 'is_guide',)
 
     def create(self, validated_data):
         name, surname = validated_data.get('ambassadorName').split()
@@ -222,3 +222,12 @@ class ContentPostSerializer(serializers.ModelSerializer):
         )
 
         return content
+
+    def validate_ambassadorName(self, ambassadorName):
+        """Проверка корректности ввода имени Амбассадора."""
+
+        if len(ambassadorName.split()) != 2:
+            raise serializers.ValidationError(
+                "Введите `Имя` и `Фамилия` Амбассадора через пробел"
+            )
+        return ambassadorName

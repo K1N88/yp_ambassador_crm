@@ -128,6 +128,10 @@ class ContentType(models.Model):
 
 class Content(models.Model):
     link = models.URLField()
+    created_at = models.DateTimeField(
+        verbose_name='Дата загрузки контента',
+        auto_now_add=True
+    )
     content_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
