@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from ambassadors.models import Ambassadors
+from ambassadors.models import Ambassadors, ContentType
 from .models import MerchForSend, Budget
 
 
 class MerchSerializer(serializers.ModelSerializer):
-    ambassadorName = serializers.CharField(source='ambassador.name')
-    style = serializers.CharField(source='merch.name')
+    ambassadorName = serializers.CharField(source='ambassador.name', read_only=True)
+    style = serializers.CharField(source='merch.name', read_only=True)
     commentToLogist = serializers.CharField(source='comment')
     kind = serializers.SerializerMethodField()
     requestDate = serializers.DateField(source='date')
@@ -18,11 +18,9 @@ class MerchSerializer(serializers.ModelSerializer):
                   'shipped')
 
     def get_kind(self, obj):
-        # ambassador = obj.ambassador
-        # content = ambassador.content_set.get()
-        # kind = content.content_type.name
-        # return kind
-        return obj
+        content_type = ContentType.objects.get(ambassador=obj.ambassador)
+        return content_type.title
+
 
     def create(self, validated_data):
         ambassadorName = validated_data['ambassadorName']
