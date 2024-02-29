@@ -1,10 +1,8 @@
 from django.conf import settings
-from django.shortcuts import get_object_or_404
 from django.db.models import Count, Sum
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
-from merch.models import Budget, MerchForSend
 from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
 from merch.models import Budget, MerchForSend
 from users.models import CrmUser
@@ -84,31 +82,60 @@ class BudgetSerializer(serializers.Serializer):
 
 
 class ContentUpdateSerializer(serializers.ModelSerializer):
-    ''''Сериализатор для модели "Контент" запросов PUT PATCH.'''
+    '''Сериализатор для обновления Контента.'''
 
-    class Meta:
-        model = Content
-        # fields = ('content_type',)
-        fields = ('id',)
-
-
-class ContentTypeSerializer(serializers.ModelSerializer):
-    '''Сериализатор для модели "Тип Контента" в ContentListSerializer.'''
-
-    contents = serializers.SerializerMethodField()
+    ambassadorName = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = ContentType
-        fields = ('title', 'status', 'contents')
+        fields = ('ambassadorName', 'title', 'status')
 
-    def get_contents(self, obj):
-        contents = obj.contents.all()
-        serialized_contents = [
-            {"link": content.link}
-            for content in contents
-        ]
+    def get_ambassadorName(self, obj):
+        ambassador = obj.ambassador
+        full_name = ' '.join(
+            [ambassador.surname, ambassador.name, ambassador.patronymic]
+        )
+        return full_name
 
-        return serialized_contents
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+        return instance
+
+    def validate(self, data):
+        status_value = self.initial_data.get('status')
+        title_status = self.initial_data.get('title')
+
+        if status_value is None or title_status is None:
+            raise serializers.ValidationError(
+                'Необходимо указать `status` и `title` в теле запроса'
+            )
+
+        if title_status not in [
+            item for sublist in ContentType.CONTENT_TYPES for item in sublist
+        ]:
+            raise serializers.ValidationError(
+                'Укажите корректное значение `title`'
+            )
+        return data
+
+
+class ContentSerializer(serializers.ModelSerializer):
+    '''Сериализатор для модели "Контент".'''
+
+    class Meta:
+        model = Content
+        fields = ('id', 'link',)
+
+
+class ContentTypeSerializer(serializers.ModelSerializer):
+    '''Сериализатор для модели "Тип Контента".'''
+    contents = ContentSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = ContentType
+        fields = ('title', 'status', 'contents',)
 
 
 class ContentListSerializer(serializers.ModelSerializer):
@@ -128,13 +155,13 @@ class ContentListSerializer(serializers.ModelSerializer):
 
     def get_ambassadorName(self, obj):
         full_name = ' '.join(
-            [obj.name, obj.surname, obj.patronymic]
+            [obj.surname, obj.name, obj.patronymic]
         )
         return full_name
 
 
 class ContentPostSerializer(serializers.ModelSerializer):
-    ''''Сериализатор для модели "Контент" запроса POST.'''
+    ''''Сериализатор для модели "Контент" запросов POST и DEL.'''
 
     ambassadorName = serializers.CharField(write_only=True)
     telegramHandle = serializers.CharField(write_only=True)
@@ -142,13 +169,13 @@ class ContentPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content
-        fields = ('ambassadorName', 'telegramHandle', 'link', 'is_guide')
+        fields = ('ambassadorName', 'telegramHandle', 'link', 'is_guide',)
 
     def create(self, validated_data):
-        name, surname = validated_data.pop('ambassadorName').split()
-        telegramHandle = validated_data.pop('telegramHandle')
-        link = validated_data.pop('link')
-        is_guide = validated_data.pop('is_guide')
+        name, surname = validated_data.get('ambassadorName').split()
+        telegramHandle = validated_data.get('telegramHandle')
+        link = validated_data.get('link')
+        is_guide = validated_data.get('is_guide')
 
         try:
             ambassador = Ambassadors.objects.get(
@@ -195,3 +222,12 @@ class ContentPostSerializer(serializers.ModelSerializer):
         )
 
         return content
+
+    def validate_ambassadorName(self, ambassadorName):
+        """Проверка корректности ввода имени Амбассадора."""
+
+        if len(ambassadorName.split()) != 2:
+            raise serializers.ValidationError(
+                "Введите `Имя` и `Фамилия` Амбассадора через пробел"
+            )
+        return ambassadorName

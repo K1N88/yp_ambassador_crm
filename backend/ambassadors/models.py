@@ -1,6 +1,6 @@
-from django.db import models
 from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 from ambassadors.validators import (validate_index, validate_phone,
                                     validate_tg_handle)
@@ -123,6 +123,10 @@ class ContentType(models.Model):
 
 class Content(models.Model):
     link = models.URLField()
+    created_at = models.DateTimeField(
+        verbose_name='Дата загрузки контента',
+        auto_now_add=True
+    )
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
                                      related_name='contents', blank=True,
                                      null=True)
