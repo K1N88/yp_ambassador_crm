@@ -1,5 +1,5 @@
 import xlwt
-from django.db.models import Count
+from django.db.models import Count, Max
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status, viewsets
@@ -187,6 +187,7 @@ class ContentViewSet(
     def get_queryset(self):
         if self.request.method in SAFE_METHODS:
             return Ambassadors.objects.annotate(
+                latest_content_date=Max('content_types__contents__created_at'),
                 content_count=Count('content_types__contents')
-            ).filter(content_count__gt=0)
+            ).filter(content_count__gt=0).order_by('-latest_content_date')
         return Content.objects.all()
