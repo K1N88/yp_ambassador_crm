@@ -22,7 +22,6 @@ class Ambassadors(models.Model):
         ("М", "Мужской"),
         ("Ж", "Женский")
     )
-
     SHIRT_SIZES = (
         ("XS", "Extra Small"),
         ("S", "Small"),
@@ -30,7 +29,6 @@ class Ambassadors(models.Model):
         ("L", "Large"),
         ("XL", "Extra Large")
     )
-
     STATUS = (
         ("active", "Активный"),
         ("inactive", "Не активный")
@@ -88,7 +86,8 @@ class Ambassadors(models.Model):
     class Meta:
         ordering = ('surname', 'name', 'patronymic', 'date_created')
 
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Напиши __str__
+    def __str__(self):
+        return f'{self.surname} {self.name} {self.patronymic}'
 
 
 class ContentType(models.Model):
@@ -99,7 +98,6 @@ class ContentType(models.Model):
         ('Гайд', 'Гайд'),
         ('После гайда', 'После гайда'),
     ]
-
     CONTENT_STATUS = [
         ('Выполнено', 'Выполнено'),
         ('Не выполнено', 'Не выполнено'),
@@ -116,11 +114,8 @@ class ContentType(models.Model):
         choices=CONTENT_STATUS,
         default='Не выполнено'
     )
-    ambassador = models.ForeignKey(
-        Ambassadors,
-        on_delete=models.CASCADE,
-        related_name='content_types',
-    )
+    ambassador = models.ForeignKey(Ambassadors, on_delete=models.CASCADE,
+                                   related_name='content_types',)
 
     def __str__(self):
         return f"{self.title} - {self.ambassador.name}"
@@ -132,13 +127,9 @@ class Content(models.Model):
         verbose_name='Дата загрузки контента',
         auto_now_add=True
     )
-    content_type = models.ForeignKey(
-        ContentType,
-        on_delete=models.CASCADE,
-        related_name='contents',
-        blank=True,
-        null=True
-    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
+                                     related_name='contents', blank=True,
+                                     null=True)
 
     def __str__(self):
         return self.link

@@ -31,15 +31,17 @@ class MerchandiseView(viewsets.GenericViewSet, mixins.ListModelMixin):
         font_style = xlwt.XFStyle()
         font_style.font.bold = True
 
-        columns = ['Имя', 'Тип мерча', 'Комментарий', 'Дата отправки', 'Статус', ]
+        columns = ['Имя', 'Тип мерча', 'Комментарий', 'Дата отправки',
+                   'Статус']
 
         for col_num in range(len(columns)):
             ws.write(row_num, col_num, columns[col_num], font_style)
 
         font_style = xlwt.XFStyle()
 
-        rows = MerchForSend.objects.all().values_list('ambassador__name', 'merch__name',
-                                                      'comment', 'date', 'shipped')
+        rows = MerchForSend.objects.all().values_list(
+            'ambassador__name', 'merch__name', 'comment', 'date', 'shipped'
+        )
         for row in rows:
             row_num += 1
             for col_num in range(len(row)):
