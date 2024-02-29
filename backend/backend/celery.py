@@ -13,8 +13,8 @@ app.conf.broker_url = settings.CELERY_BROKER_URL
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'backup-database': {
-        'task': 'api.tasks.backup_database',
-        'schedule': crontab(hour=0, minute=0),  # Run daily at midnight
+    'backup-db': {
+        'task': 'api.tasks.backup_db',
+        'schedule': crontab(hour=0, minute=0),
     },
 }
