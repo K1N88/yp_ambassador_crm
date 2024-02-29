@@ -1,5 +1,6 @@
 from rest_framework import filters
 
+
 class AmbassadorFilterBackend(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         # Получите параметры фильтрации из запроса
@@ -22,7 +23,6 @@ class AmbassadorFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(ambassador__status=status)
         if city:
             queryset = queryset.filter(ambassador__city=city)
-        
         return queryset
 
 
@@ -43,5 +43,4 @@ class MerchFilterBackend(filters.BaseFilterBackend):
             queryset = queryset.filter(date__gte=shipped_from)
         if shipped_to:
             queryset = queryset.filter(date__lte=shipped_to)
-
         return queryset

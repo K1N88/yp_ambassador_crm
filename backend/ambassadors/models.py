@@ -1,6 +1,6 @@
-from django.db import models
 from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 from ambassadors.validators import (validate_index, validate_phone,
                                     validate_tg_handle)
@@ -87,3 +87,58 @@ class Ambassadors(models.Model):
 
     class Meta:
         ordering = ('surname', 'name', 'patronymic', 'date_created')
+
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Напиши __str__
+
+
+class ContentType(models.Model):
+    '''Тип Контента.'''
+
+    CONTENT_TYPES = [
+        ('Первый отзыв', 'Первый отзыв'),
+        ('Гайд', 'Гайд'),
+        ('После гайда', 'После гайда'),
+    ]
+
+    CONTENT_STATUS = [
+        ('Выполнено', 'Выполнено'),
+        ('Не выполнено', 'Не выполнено'),
+    ]
+
+    title = models.CharField(
+        max_length=15,
+        verbose_name="Название контента",
+        choices=CONTENT_TYPES
+    )
+    status = models.CharField(
+        max_length=15,
+        verbose_name="Статус контента",
+        choices=CONTENT_STATUS,
+        default='Не выполнено'
+    )
+    ambassador = models.ForeignKey(
+        Ambassadors,
+        on_delete=models.CASCADE,
+        related_name='content_types',
+    )
+
+    def __str__(self):
+        return f"{self.title} - {self.ambassador.name}"
+
+
+class Content(models.Model):
+    link = models.URLField()
+    created_at = models.DateTimeField(
+        verbose_name='Дата загрузки контента',
+        auto_now_add=True
+    )
+    content_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        related_name='contents',
+        blank=True,
+        null=True
+    )
+
+    def __str__(self):
+        return self.link

@@ -19,7 +19,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="API Documentation",
         default_version='v1',
-        description="API documentation for Lenta project",
+        description="API documentation for Ambassadors project",
         terms_of_service="https://www.example.com/policies/terms/",
         contact=openapi.Contact(email="contact@example.com"),
         license=openapi.License(name="BSD License"),
@@ -36,5 +36,4 @@ urlpatterns = [
          name='schema-redoc'),
     path('admin/', admin.site.urls),
     path('', include('api.urls')),
-    path('', include('merch.urls')),
 ]
