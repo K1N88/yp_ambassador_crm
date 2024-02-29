@@ -42,7 +42,6 @@ class AmbassadorsViewSet(
         '''Средства на амбассадора'''
         ambassador = self.get_object()
         budget = Budget.objects.filter(ambassador=ambassador)
-        print(budget)
         serializer = BudgetSerializer(budget, many=True)
 
         return Response(serializer.data)
