@@ -46,7 +46,7 @@ class Ambassadors(models.Model):
     surname = models.CharField(verbose_name='фамилия',
                                max_length=settings.MAX_LENGTH)
     name = models.CharField(verbose_name='имя', max_length=settings.MAX_LENGTH)
-    patronymic = models.CharField(verbose_name='отчество', null=True,
+    patronymic = models.CharField(verbose_name='отчество', null=True, blank=True,
                                   max_length=settings.MAX_LENGTH)
     gender = models.CharField(max_length=1, choices=GENDER)
     study_programm = models.ForeignKey(StudyProgramm, null=True,
@@ -87,7 +87,11 @@ class Ambassadors(models.Model):
         ordering = ('surname', 'name', 'patronymic', 'date_created')
 
     def __str__(self):
-        return f'{self.surname} {self.name} {self.patronymic}'
+        return f'{self.surname} {self.name} {self.patronymic or ""}'.strip()
+
+    @property
+    def full_name(self):
+        return f'{self.surname} {self.name} {self.patronymic or ""}'.strip()
 
 
 class ContentType(models.Model):
