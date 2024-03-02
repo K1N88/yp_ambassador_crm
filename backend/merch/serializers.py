@@ -26,5 +26,6 @@ class MerchSerializer(serializers.ModelSerializer):
         ambassadorName = validated_data['ambassadorName']
         merch_for_send_id = validated_data['id']
         ambassador = Ambassadors.objects.get(name=ambassadorName)
-        Budget.objects.create(ambassador=ambassador.id, merch=merch_for_send_id)
+        Budget.objects.create(ambassador=ambassador.id,
+                              merch=merch_for_send_id)
         return super().create(validated_data)

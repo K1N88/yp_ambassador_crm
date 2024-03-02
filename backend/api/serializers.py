@@ -92,10 +92,7 @@ class ContentUpdateSerializer(serializers.ModelSerializer):
 
     def get_ambassadorName(self, obj):
         ambassador = obj.ambassador
-        full_name = ' '.join(
-            [ambassador.surname, ambassador.name, ambassador.patronymic]
-        )
-        return full_name
+        return ambassador.full_name
 
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
@@ -154,10 +151,7 @@ class ContentListSerializer(serializers.ModelSerializer):
         fields = ('ambassadorName', 'telegramHandle', 'content_types',)
 
     def get_ambassadorName(self, obj):
-        full_name = ' '.join(
-            [obj.surname, obj.name, obj.patronymic]
-        )
-        return full_name
+        return obj.full_name
 
 
 class ContentPostSerializer(serializers.ModelSerializer):
@@ -169,7 +163,7 @@ class ContentPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Content
-        fields = ('ambassadorName', 'telegramHandle', 'link', 'is_guide')
+        fields = ('ambassadorName', 'telegramHandle', 'link', 'is_guide',)
 
     def create(self, validated_data):
         name, surname = validated_data.get('ambassadorName').split()
@@ -222,3 +216,12 @@ class ContentPostSerializer(serializers.ModelSerializer):
         )
 
         return content
+
+    def validate_ambassadorName(self, ambassadorName):
+        """Проверка корректности ввода имени Амбассадора."""
+
+        if len(ambassadorName.split()) != 2:
+            raise serializers.ValidationError(
+                "Введите `Имя` и `Фамилия` Амбассадора через пробел"
+            )
+        return ambassadorName

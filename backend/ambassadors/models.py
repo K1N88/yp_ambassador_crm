@@ -22,7 +22,6 @@ class Ambassadors(models.Model):
         ("М", "Мужской"),
         ("Ж", "Женский")
     )
-
     SHIRT_SIZES = (
         ("XS", "Extra Small"),
         ("S", "Small"),
@@ -30,7 +29,6 @@ class Ambassadors(models.Model):
         ("L", "Large"),
         ("XL", "Extra Large")
     )
-
     STATUS = (
         ("active", "Активный"),
         ("inactive", "Не активный")
@@ -48,7 +46,7 @@ class Ambassadors(models.Model):
     surname = models.CharField(verbose_name='фамилия',
                                max_length=settings.MAX_LENGTH)
     name = models.CharField(verbose_name='имя', max_length=settings.MAX_LENGTH)
-    patronymic = models.CharField(verbose_name='отчество', null=True,
+    patronymic = models.CharField(verbose_name='отчество', null=True, blank=True,
                                   max_length=settings.MAX_LENGTH)
     gender = models.CharField(max_length=1, choices=GENDER)
     study_programm = models.ForeignKey(StudyProgramm, null=True,
@@ -88,7 +86,12 @@ class Ambassadors(models.Model):
     class Meta:
         ordering = ('surname', 'name', 'patronymic', 'date_created')
 
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Напиши __str__
+    def __str__(self):
+        return f'{self.surname} {self.name} {self.patronymic or ""}'.strip()
+
+    @property
+    def full_name(self):
+        return f'{self.surname} {self.name} {self.patronymic or ""}'.strip()
 
 
 class ContentType(models.Model):
@@ -99,7 +102,6 @@ class ContentType(models.Model):
         ('Гайд', 'Гайд'),
         ('После гайда', 'После гайда'),
     ]
-
     CONTENT_STATUS = [
         ('Выполнено', 'Выполнено'),
         ('Не выполнено', 'Не выполнено'),
@@ -116,11 +118,8 @@ class ContentType(models.Model):
         choices=CONTENT_STATUS,
         default='Не выполнено'
     )
-    ambassador = models.ForeignKey(
-        Ambassadors,
-        on_delete=models.CASCADE,
-        related_name='content_types',
-    )
+    ambassador = models.ForeignKey(Ambassadors, on_delete=models.CASCADE,
+                                   related_name='content_types',)
 
     def __str__(self):
         return f"{self.title} - {self.ambassador.name}"
@@ -128,13 +127,13 @@ class ContentType(models.Model):
 
 class Content(models.Model):
     link = models.URLField()
-    content_type = models.ForeignKey(
-        ContentType,
-        on_delete=models.CASCADE,
-        related_name='contents',
-        blank=True,
-        null=True
+    created_at = models.DateTimeField(
+        verbose_name='Дата загрузки контента',
+        auto_now_add=True
     )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
+                                     related_name='contents', blank=True,
+                                     null=True)
 
     def __str__(self):
         return self.link
