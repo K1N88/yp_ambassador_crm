@@ -31,7 +31,9 @@ class Ambassadors(models.Model):
     )
     STATUS = (
         ("active", "Активный"),
-        ("inactive", "Не активный")
+        ("pause", "На паузе"),
+        ("not_ambassador", "Не амбассадор"),
+        ("to_check", "Уточняется"),
     )
     CONTACT_PREFERENCES = (
         ("email", "email"),
@@ -75,7 +77,7 @@ class Ambassadors(models.Model):
 
     # поля формы куратора
     promocode = models.CharField(null=True, max_length=settings.MAX_LENGTH)
-    status = models.CharField(null=True, max_length=8, choices=STATUS)
+    status = models.CharField(null=True, max_length=14, choices=STATUS)
     supervisor = models.ForeignKey(CrmUser, null=True,
                                    on_delete=models.SET_NULL,
                                    related_name='ambassador_user')
