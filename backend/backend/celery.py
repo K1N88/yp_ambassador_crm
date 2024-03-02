@@ -14,7 +14,7 @@ app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
     'backup-db': {
-        'task': 'api.tasks.backup_db',
+        'task': 'backup_db',
         'schedule': crontab(hour=0, minute=0),
     },
 }
