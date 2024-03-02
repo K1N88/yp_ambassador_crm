@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from django.core.management.utils import get_random_secret_key
 
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser',
     'django_filters',
+    "django_celery_beat",
     'drf_extra_fields',
     'drf_yasg',
     'dbbackup',
@@ -211,9 +213,10 @@ REDIS_PORT = os.getenv('REDIS_PORT')
 CELERY_BROKER_URL = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
 CELERY_BROKER_TRANSPORT_OPTIONS = {"visibility_timeout": 3600}
 CELERY_RESULT_BACKEND = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': '/root/crm_app/backup/'}
+DBBACKUP_STORAGE_OPTIONS = {'location': '/backup/'}
 
 DBBACKUP_CLEANUP_KEEP = 30
 DBBACKUP_CLEANUP_KEEP_MEDIA = 30
