@@ -9,7 +9,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import MerchForSend
 from .serializers import MerchSerializer
-# from .filters import AmbassadorFilterBackend, MerchFilterBackend
 from .filters import MerchFilter 
 
 
