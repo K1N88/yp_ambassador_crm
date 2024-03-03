@@ -8,7 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.decorators import action, api_view
 from rest_framework import mixins, status, viewsets
-from rest_framework.permissions import SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
@@ -208,6 +208,11 @@ class ContentViewSet(
                 content_count=Count('content_types__contents')
             ).filter(content_count__gt=0).order_by('-latest_content_date')
         return Content.objects.all()
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return (AllowAny(),)
+        return (IsAuthenticated(),)
 
 
 @api_view(['POST'])
