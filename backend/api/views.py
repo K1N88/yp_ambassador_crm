@@ -49,6 +49,11 @@ class AmbassadorsViewSet(
                         'city', 'want_to_do', 'date_from', 'date_to',
                         'supervisor']
 
+    def get_permissions(self):
+        if self.action == 'create':
+            return (AllowAny(),)
+        return (IsAuthenticated(),)
+
     def get_serializer_class(self):
         if self.action == 'update_content_status':
             return ContentUpdateSerializer
