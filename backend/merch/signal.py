@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from ambassadors.models import ContentType
 from .models import MerchForSend
 
+
 @receiver(post_save, sender=ContentType)
 def create_merch_for_send(sender, instance, **kwargs):
     # Проверяем, было ли изменено поле status на "Выполнено"
