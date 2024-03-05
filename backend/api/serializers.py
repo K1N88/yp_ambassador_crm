@@ -159,7 +159,7 @@ class ContentPostSerializer(serializers.ModelSerializer):
 
     ambassadorName = serializers.CharField(write_only=True)
     telegramHandle = serializers.CharField(write_only=True)
-    is_guide = serializers.BooleanField(write_only=True)
+    is_guide = serializers.CharField(write_only=True, allow_blank=True)
 
     class Meta:
         model = Content
@@ -196,14 +196,19 @@ class ContentPostSerializer(serializers.ModelSerializer):
 
         if content_count == 0:
             content_type_title = 'Первый отзыв'
-        elif is_guide and guide_content_count >= 5:
+        elif is_guide == 'Да' and guide_content_count >= 5:
             raise serializers.ValidationError(
                 'Поле «Ссылки по гайду» может размещать только до пяти ссылок!'
             )
-        elif is_guide:
+        elif is_guide == 'Да':
             content_type_title = 'Гайд'
-        else:
+        elif is_guide == 'Нет' or not is_guide:
             content_type_title = 'После гайда'
+        else:
+            raise serializers.ValidationError(
+                'Поле «Это Гайд начинающего амбассадора?» может принимать ' +
+                '`Да`, `Нет` или ``!'
+            )
 
         content_type, _ = ContentType.objects.get_or_create(
             title=content_type_title,
