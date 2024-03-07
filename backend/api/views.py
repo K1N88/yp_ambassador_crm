@@ -39,6 +39,7 @@ class AmbassadorsViewSet(
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
     mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
     '''Обработчик для амбассадоров'''
