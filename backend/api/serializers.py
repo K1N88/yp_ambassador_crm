@@ -142,13 +142,13 @@ class ContentListSerializer(serializers.ModelSerializer):
     telegramHandle = serializers.CharField(
         source='telegram_handle', read_only=True
     )
-    content_types = ContentTypeSerializer(
-        many=True, read_only=True
+    contentTypes = ContentTypeSerializer(
+        source='content_types', many=True, read_only=True
     )
 
     class Meta:
         model = Ambassadors
-        fields = ('ambassadorName', 'telegramHandle', 'content_types',)
+        fields = ('ambassadorName', 'telegramHandle', 'contentTypes',)
 
     def get_ambassadorName(self, obj):
         return obj.full_name
