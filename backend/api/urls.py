@@ -9,8 +9,8 @@ router = DefaultRouter()
 
 router.register(r'ambassadors', AmbassadorsViewSet, basename='ambassadors')
 router.register(r'budget', BudgetViewSet, basename='budget')
-router.register(r'supervisors', StudyProgrammViewSet)
-router.register(r'study_programms', SupervisorViewSet)
+router.register(r'supervisors', SupervisorViewSet)
+router.register(r'study_programms', StudyProgrammViewSet)
 router.register(r'merchandise', MerchandiseView, basename='merchandises')
 router.register(r'content', ContentViewSet, basename='content')
 
