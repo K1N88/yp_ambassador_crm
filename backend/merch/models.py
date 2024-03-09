@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
-from ambassadors.models import Ambassadors
+from ambassadors.models import Ambassadors, ContentType
 
 from backend.settings import NAME_MAX_LENGTH, COMMENT_MAX_LENGTH
 
@@ -22,6 +22,8 @@ class MerchForSend(models.Model):
     date = models.DateField(auto_now_add=True)
     comment = models.CharField(max_length=COMMENT_MAX_LENGTH)
     shipped = models.BooleanField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
+                                     related_name='merch_for_send')
 
 
 class Budget(models.Model):

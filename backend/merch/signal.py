@@ -12,5 +12,6 @@ def create_merch_for_send(sender, instance, **kwargs):
         # Создаем объект MerchForSend
         MerchForSend.objects.create(
             ambassador=instance.ambassador,
-            shipped=False
+            shipped=False,
+            content_type=instance
         )
