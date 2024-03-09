@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'api',
     'ambassadors',
     'users',
-    'merch'
+    'merch',
 ]
 
 MIDDLEWARE = [
@@ -161,7 +161,7 @@ AUTH_USER_MODEL = 'users.CrmUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',

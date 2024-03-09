@@ -11,6 +11,9 @@ class StudyProgramm(models.Model):
     '''Программа обучения'''
     title = models.CharField(max_length=settings.MAX_LENGTH)
 
+    class Meta:
+        ordering = ('title',)
+
     def __str__(self):
         return self.title
 

@@ -32,3 +32,6 @@ class Budget(models.Model):
         MerchForSend, on_delete=models.CASCADE,
         blank=True, null=True, related_name='budget_merch'
     )
+
+    class Meta:
+        ordering = ('ambassador',)
