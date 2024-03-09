@@ -19,8 +19,8 @@ class Ambassadors(models.Model):
     '''Амбассадоры'''
 
     GENDER = (
-        ("М", "Мужской"),
-        ("Ж", "Женский")
+        ("Мужской", "Мужской"),
+        ("Женский", "Женский")
     )
     SHIRT_SIZES = (
         ("XS", "Extra Small"),
@@ -48,9 +48,9 @@ class Ambassadors(models.Model):
     surname = models.CharField(verbose_name='фамилия',
                                max_length=settings.MAX_LENGTH)
     name = models.CharField(verbose_name='имя', max_length=settings.MAX_LENGTH)
-    patronymic = models.CharField(verbose_name='отчество', null=True, blank=True,
-                                  max_length=settings.MAX_LENGTH)
-    gender = models.CharField(max_length=1, choices=GENDER)
+    patronymic = models.CharField(verbose_name='отчество', null=True,
+                                  blank=True, max_length=settings.MAX_LENGTH)
+    gender = models.CharField(max_length=7, choices=GENDER)
     study_programm = models.ForeignKey(StudyProgramm, null=True,
                                        on_delete=models.SET_NULL,
                                        related_name='ambassador_programm')
