@@ -110,7 +110,7 @@ class ContentUpdateSerializer(serializers.ModelSerializer):
                 'Необходимо указать `status` и `title` в теле запроса'
             )
 
-        if title_status not in [
+        if title_status.lower() == 'после гайда' or title_status not in [
             item for sublist in ContentType.CONTENT_TYPES for item in sublist
         ]:
             raise serializers.ValidationError(
@@ -134,6 +134,17 @@ class ContentTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContentType
         fields = ('title', 'status', 'contents',)
+
+    def to_representation(self, instance):
+        """
+        Не выводим `status` для типа `После Гайда`.
+        """
+
+        data = super().to_representation(instance)
+        if data['title'].lower() == 'после гайда':
+            data.pop('status', None)
+
+        return data
 
 
 class ContentListSerializer(serializers.ModelSerializer):
