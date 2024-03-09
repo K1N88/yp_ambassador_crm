@@ -15,9 +15,10 @@ class MerchForSend(models.Model):
                                    related_name='merch_for_send',
                                    verbose_name='Амбассадор')
     merch = models.ForeignKey(Merch, on_delete=models.CASCADE,
+                              null=True,
                               related_name='merch_for_send_items',
                               verbose_name='Мерч')
-    count = models.IntegerField()
+    count = models.IntegerField(default=1)
     date = models.DateField(auto_now_add=True)
     comment = models.CharField(max_length=COMMENT_MAX_LENGTH)
     shipped = models.BooleanField()

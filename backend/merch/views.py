@@ -5,15 +5,17 @@ from rest_framework import mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import MerchForSend
 from .serializers import MerchSerializer
-from .filters import AmbassadorFilterBackend, MerchFilterBackend
+from .filters import MerchFilter 
 
 
 class MerchandiseView(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = MerchSerializer
-    filter_backends = [AmbassadorFilterBackend, MerchFilterBackend]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = MerchFilter 
 
     def get_queryset(self):
         return MerchForSend.objects.all()
@@ -31,15 +33,17 @@ class MerchandiseView(viewsets.GenericViewSet, mixins.ListModelMixin):
         font_style = xlwt.XFStyle()
         font_style.font.bold = True
 
-        columns = ['Имя', 'Тип мерча', 'Комментарий', 'Дата отправки', 'Статус', ]
+        columns = ['Имя', 'Тип мерча', 'Комментарий', 'Дата отправки',
+                   'Статус']
 
         for col_num in range(len(columns)):
             ws.write(row_num, col_num, columns[col_num], font_style)
 
         font_style = xlwt.XFStyle()
 
-        rows = MerchForSend.objects.all().values_list('ambassador__name', 'merch__name',
-                                                      'comment', 'date', 'shipped')
+        rows = MerchForSend.objects.all().values_list(
+            'ambassador__name', 'merch__name', 'comment', 'date', 'shipped'
+        )
         for row in rows:
             row_num += 1
             for col_num in range(len(row)):

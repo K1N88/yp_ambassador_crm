@@ -6,6 +6,14 @@ from merch.models import Budget, MerchForSend
 from users.models import CrmUser
 
 
+class StudyProgrammSerializer(serializers.ModelSerializer):
+    ''''Сериализатор для программ обучения'''
+
+    class Meta:
+        model = StudyProgramm
+        fields = '__all__'
+
+
 class AmbassadorPostSerializer(serializers.ModelSerializer):
     ''''Сериализатор для создания Амбассадора'''
 
@@ -19,6 +27,7 @@ class AmbassadorPostSerializer(serializers.ModelSerializer):
 
 class AmbassadorSerializer(serializers.ModelSerializer):
     ''''Сериализатор для модели Амбассадоров'''
+    study_programm = StudyProgrammSerializer()
 
     class Meta:
         model = Ambassadors
@@ -40,14 +49,6 @@ class SupervisorSerializer(serializers.ModelSerializer):
     class Meta:
         model = CrmUser
         fields = ('id', 'name', 'username', 'surname', 'email')
-
-
-class StudyProgrammSerializer(serializers.ModelSerializer):
-    ''''Сериализатор для программ обучения'''
-
-    class Meta:
-        model = StudyProgramm
-        fields = '__all__'
 
 
 class BudgetSerializer(serializers.Serializer):
@@ -90,10 +91,7 @@ class ContentUpdateSerializer(serializers.ModelSerializer):
 
     def get_ambassadorName(self, obj):
         ambassador = obj.ambassador
-        full_name = ' '.join(
-            [ambassador.surname, ambassador.name, ambassador.patronymic]
-        )
-        return full_name
+        return ambassador.full_name
 
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
@@ -143,19 +141,16 @@ class ContentListSerializer(serializers.ModelSerializer):
     telegramHandle = serializers.CharField(
         source='telegram_handle', read_only=True
     )
-    content_types = ContentTypeSerializer(
-        many=True, read_only=True
+    contentTypes = ContentTypeSerializer(
+        source='content_types', many=True, read_only=True
     )
 
     class Meta:
         model = Ambassadors
-        fields = ('ambassadorName', 'telegramHandle', 'content_types',)
+        fields = ('ambassadorName', 'telegramHandle', 'contentTypes',)
 
     def get_ambassadorName(self, obj):
-        full_name = ' '.join(
-            [obj.surname, obj.name, obj.patronymic]
-        )
-        return full_name
+        return obj.full_name
 
 
 class ContentPostSerializer(serializers.ModelSerializer):
@@ -163,7 +158,7 @@ class ContentPostSerializer(serializers.ModelSerializer):
 
     ambassadorName = serializers.CharField(write_only=True)
     telegramHandle = serializers.CharField(write_only=True)
-    is_guide = serializers.BooleanField(write_only=True)
+    is_guide = serializers.CharField(write_only=True, allow_blank=True)
 
     class Meta:
         model = Content
@@ -200,14 +195,19 @@ class ContentPostSerializer(serializers.ModelSerializer):
 
         if content_count == 0:
             content_type_title = 'Первый отзыв'
-        elif is_guide and guide_content_count >= 5:
+        elif is_guide == 'Да' and guide_content_count >= 5:
             raise serializers.ValidationError(
                 'Поле «Ссылки по гайду» может размещать только до пяти ссылок!'
             )
-        elif is_guide:
+        elif is_guide == 'Да':
             content_type_title = 'Гайд'
-        else:
+        elif is_guide == 'Нет' or not is_guide:
             content_type_title = 'После гайда'
+        else:
+            raise serializers.ValidationError(
+                'Поле «Это Гайд начинающего амбассадора?» может принимать ' +
+                '`Да`, `Нет` или ``!'
+            )
 
         content_type, _ = ContentType.objects.get_or_create(
             title=content_type_title,

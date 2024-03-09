@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from django.core.management.utils import get_random_secret_key
 
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -33,7 +34,7 @@ SECRET_KEY = get_random_secret_key()
 DEBUG = True
 
 ALLOWED_HOSTS = [os.getenv('HOST'), '127.0.0.1', 'localhost', '0.0.0.0',
-                 'backend']
+                 'backend', '*']
 
 
 # Application definition
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser',
     'django_filters',
+    "django_celery_beat",
     'drf_extra_fields',
     'drf_yasg',
     'dbbackup',
@@ -167,8 +169,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS':
-        'rest_framework.pagination.PageNumberPagination',
-    "PAGE_SIZE": 10,
+        'api.paginator.CustomPageNumberPagination',
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
@@ -213,9 +214,10 @@ REDIS_PORT = os.getenv('REDIS_PORT')
 CELERY_BROKER_URL = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
 CELERY_BROKER_TRANSPORT_OPTIONS = {"visibility_timeout": 3600}
 CELERY_RESULT_BACKEND = "redis://" + REDIS_HOST + ":" + REDIS_PORT + "/0"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': '/root/crm_app/backup/'}
+DBBACKUP_STORAGE_OPTIONS = {'location': '/backup/'}
 
 DBBACKUP_CLEANUP_KEEP = 30
 DBBACKUP_CLEANUP_KEEP_MEDIA = 30

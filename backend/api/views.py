@@ -1,10 +1,14 @@
 import xlwt
+import logging
+import pandas as pd
+
 from django.db.models import Count, Max
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
+
+from rest_framework.decorators import action, api_view
 from rest_framework import mixins, status, viewsets
-from rest_framework.decorators import action
-from rest_framework.permissions import SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
@@ -18,10 +22,24 @@ from merch.models import Budget
 from users.models import CrmUser
 
 
+def setup_logger():
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s, %(levelname)s, %(message)s')
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
+
+
+logger = setup_logger()
+
+
 class AmbassadorsViewSet(
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
     mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
     '''Обработчик для амбассадоров'''
@@ -31,6 +49,11 @@ class AmbassadorsViewSet(
     filterset_fields = ['study_programm', 'status', 'gender', 'country',
                         'city', 'want_to_do', 'date_from', 'date_to',
                         'supervisor']
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return (AllowAny(),)
+        return (IsAuthenticated(),)
 
     def get_serializer_class(self):
         if self.action == 'update_content_status':
@@ -190,3 +213,38 @@ class ContentViewSet(
                 content_count=Count('content_types__contents')
             ).filter(content_count__gt=0).order_by('-latest_content_date')
         return Content.objects.all()
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return (AllowAny(),)
+        return (IsAuthenticated(),)
+
+
+@api_view(['POST'])
+def import_ambassadors(request):
+    if 'file' not in request.FILES:
+        return JsonResponse({'error': 'No file uploaded'}, status=400)
+
+    file = request.FILES['file']
+    if not file.name.endswith('.xls') and not file.name.endswith('.xlsx'):
+        return JsonResponse({'error': 'File must be in Excel format'},
+                            status=400)
+
+    try:
+        df = pd.read_excel(file)
+        ambassadors_data = df.to_dict(orient='records')
+        ambassadors = []
+        study_programm = StudyProgramm.objects.all()
+        for item in ambassadors_data:
+            item['study_programm'] = study_programm.get(
+                pk=item['study_programm']
+            )
+            ambassadors.append(
+                Ambassadors(**item)
+            )
+        Ambassadors.objects.bulk_create(ambassadors)
+
+        return JsonResponse({'message': 'Ambassadors imported successfully'},
+                            status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

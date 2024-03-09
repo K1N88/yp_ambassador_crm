@@ -22,10 +22,9 @@ class Ambassadors(models.Model):
     '''Амбассадоры'''
 
     GENDER = (
-        ("М", "Мужской"),
-        ("Ж", "Женский")
+        ("Мужской", "Мужской"),
+        ("Женский", "Женский")
     )
-
     SHIRT_SIZES = (
         ("XS", "Extra Small"),
         ("S", "Small"),
@@ -33,10 +32,11 @@ class Ambassadors(models.Model):
         ("L", "Large"),
         ("XL", "Extra Large")
     )
-
     STATUS = (
         ("active", "Активный"),
-        ("inactive", "Не активный")
+        ("pause", "На паузе"),
+        ("not_ambassador", "Не амбассадор"),
+        ("to_check", "Уточняется"),
     )
     CONTACT_PREFERENCES = (
         ("email", "email"),
@@ -52,8 +52,8 @@ class Ambassadors(models.Model):
                                max_length=settings.MAX_LENGTH)
     name = models.CharField(verbose_name='имя', max_length=settings.MAX_LENGTH)
     patronymic = models.CharField(verbose_name='отчество', null=True,
-                                  max_length=settings.MAX_LENGTH)
-    gender = models.CharField(max_length=1, choices=GENDER)
+                                  blank=True, max_length=settings.MAX_LENGTH)
+    gender = models.CharField(max_length=7, choices=GENDER)
     study_programm = models.ForeignKey(StudyProgramm, null=True,
                                        on_delete=models.SET_NULL,
                                        related_name='ambassador_programm')
@@ -80,7 +80,7 @@ class Ambassadors(models.Model):
 
     # поля формы куратора
     promocode = models.CharField(null=True, max_length=settings.MAX_LENGTH)
-    status = models.CharField(null=True, max_length=8, choices=STATUS)
+    status = models.CharField(null=True, max_length=14, choices=STATUS)
     supervisor = models.ForeignKey(CrmUser, null=True,
                                    on_delete=models.SET_NULL,
                                    related_name='ambassador_user')
@@ -91,7 +91,12 @@ class Ambassadors(models.Model):
     class Meta:
         ordering = ('surname', 'name', 'patronymic', 'date_created')
 
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Напиши __str__
+    def __str__(self):
+        return f'{self.surname} {self.name} {self.patronymic or ""}'.strip()
+
+    @property
+    def full_name(self):
+        return f'{self.surname} {self.name} {self.patronymic or ""}'.strip()
 
 
 class ContentType(models.Model):
@@ -102,7 +107,6 @@ class ContentType(models.Model):
         ('Гайд', 'Гайд'),
         ('После гайда', 'После гайда'),
     ]
-
     CONTENT_STATUS = [
         ('Выполнено', 'Выполнено'),
         ('Не выполнено', 'Не выполнено'),
@@ -119,11 +123,8 @@ class ContentType(models.Model):
         choices=CONTENT_STATUS,
         default='Не выполнено'
     )
-    ambassador = models.ForeignKey(
-        Ambassadors,
-        on_delete=models.CASCADE,
-        related_name='content_types',
-    )
+    ambassador = models.ForeignKey(Ambassadors, on_delete=models.CASCADE,
+                                   related_name='content_types',)
 
     def __str__(self):
         return f"{self.title} - {self.ambassador.name}"
@@ -135,13 +136,9 @@ class Content(models.Model):
         verbose_name='Дата загрузки контента',
         auto_now_add=True
     )
-    content_type = models.ForeignKey(
-        ContentType,
-        on_delete=models.CASCADE,
-        related_name='contents',
-        blank=True,
-        null=True
-    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
+                                     related_name='contents', blank=True,
+                                     null=True)
 
     def __str__(self):
         return self.link
