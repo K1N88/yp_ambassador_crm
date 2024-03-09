@@ -8,6 +8,14 @@ from merch.models import Budget, MerchForSend
 from users.models import CrmUser
 
 
+class StudyProgrammSerializer(serializers.ModelSerializer):
+    ''''Сериализатор для программ обучения'''
+
+    class Meta:
+        model = StudyProgramm
+        fields = '__all__'
+
+
 class AmbassadorPostSerializer(serializers.ModelSerializer):
     ''''Сериализатор для создания Амбассадора'''
 
@@ -21,6 +29,7 @@ class AmbassadorPostSerializer(serializers.ModelSerializer):
 
 class AmbassadorSerializer(serializers.ModelSerializer):
     ''''Сериализатор для модели Амбассадоров'''
+    study_programm = StudyProgrammSerializer()
 
     class Meta:
         model = Ambassadors
@@ -42,14 +51,6 @@ class SupervisorSerializer(serializers.ModelSerializer):
     class Meta:
         model = CrmUser
         fields = ('id', 'name', 'username', 'surname', 'email')
-
-
-class StudyProgrammSerializer(serializers.ModelSerializer):
-    ''''Сериализатор для программ обучения'''
-
-    class Meta:
-        model = StudyProgramm
-        fields = '__all__'
 
 
 class BudgetSerializer(serializers.Serializer):
