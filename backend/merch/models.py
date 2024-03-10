@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.validators import MinValueValidator
-from ambassadors.models import Ambassadors
+from ambassadors.models import Ambassadors, ContentType, Content
 
 from backend.settings import NAME_MAX_LENGTH, COMMENT_MAX_LENGTH
 
@@ -13,6 +13,11 @@ class Merch(models.Model):
 
 
 class MerchForSend(models.Model):
+    SHIPMENT_STATUS = (
+        ("Отправлено", "Отправлено"),
+        ("Не отправлено", "Не отправлено"),
+        ("На отправке", "На отправке"),
+    )
     ambassador = models.ForeignKey(Ambassadors, on_delete=models.CASCADE,
                                    related_name='merch_for_send',
                                    verbose_name='Амбассадор')
@@ -23,7 +28,13 @@ class MerchForSend(models.Model):
     count = models.IntegerField(default=1)
     date = models.DateField(auto_now_add=True)
     comment = models.CharField(max_length=COMMENT_MAX_LENGTH)
-    shipped = models.BooleanField()
+    shipped = models.CharField(max_length=14, choices=SHIPMENT_STATUS)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,
+                                     related_name='merch_for_send')
+    content = models.ForeignKey(Content, on_delete=models.CASCADE,
+                                null=True,
+                                related_name='merch_for_send',
+                                verbose_name='Контент')
 
 
 class Budget(models.Model):

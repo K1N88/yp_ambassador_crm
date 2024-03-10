@@ -18,5 +18,5 @@ class MerchSerializer(serializers.ModelSerializer):
                   'shipped')
 
     def get_kind(self, obj):
-        content_type = ContentType.objects.get(ambassador=obj.ambassador)
+        content_type = obj.content_type
         return content_type.title
