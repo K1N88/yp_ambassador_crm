@@ -39,7 +39,11 @@ class AmbassadorUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ambassadors
-        fields = ('blog_url', 'promocode', 'status', 'supervisor',
+        fields = ('surname', 'name', 'patronymic', 'gender', 'study_programm',
+                  'country', 'city', 'address', 'zip_code', 'email', 'phone',
+                  'telegram_handle', 'education', 'job', 'aim', 'want_to_do',
+                  'blog_url', 'shirt_size', 'shoes_size', 'comment',
+                  'promocode', 'status', 'supervisor',
                   'supervisor_comment', 'contact_preferences')
 
 
