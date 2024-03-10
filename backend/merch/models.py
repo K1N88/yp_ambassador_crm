@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.core.validators import MinValueValidator
 from ambassadors.models import Ambassadors, ContentType, Content
 
@@ -38,9 +40,19 @@ class MerchForSend(models.Model):
 class Budget(models.Model):
     ambassador = models.ForeignKey(
         Ambassadors, on_delete=models.CASCADE,
-        blank=True, null=True, related_name='ambassador'
+        blank=True, null=True, related_name='ambassador',
+        verbose_name='Амбассадор'
     )
     merch = models.ForeignKey(
         MerchForSend, on_delete=models.CASCADE,
-        blank=True, null=True, related_name='budget_merch'
+        blank=True, null=True, related_name='budget_merch',
+        verbose_name='Мерч'
     )
+
+    class Meta:
+        verbose_name = 'Бюджет на мерч амибассадора'
+        verbose_name_plural = 'Бюджет на мерч амибассадоров'
+        ordering = ('ambassador__surname', 'ambassador__name')
+
+    def __str__(self):
+        return f'{self.ambassador.surname} {self.ambassador.name} - {self.merch.merch.cost}'

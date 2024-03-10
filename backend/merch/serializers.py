@@ -20,12 +20,3 @@ class MerchSerializer(serializers.ModelSerializer):
     def get_kind(self, obj):
         content_type = obj.content_type
         return content_type.title
-
-
-    def create(self, validated_data):
-        ambassadorName = validated_data['ambassadorName']
-        merch_for_send_id = validated_data['id']
-        ambassador = Ambassadors.objects.get(name=ambassadorName)
-        Budget.objects.create(ambassador=ambassador.id,
-                              merch=merch_for_send_id)
-        return super().create(validated_data)

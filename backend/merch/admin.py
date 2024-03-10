@@ -1,6 +1,10 @@
 from django.contrib import admin
 
-from .models import MerchForSend, Merch
+from .models import Budget, MerchForSend, Merch
+
+@admin.register(Budget)
+class BudgetAdmin(admin.ModelAdmin):
+    list_display = ('ambassador', 'merch')
 
 
 class MerchAdmin(admin.ModelAdmin):
