@@ -121,10 +121,26 @@ class ContentUpdateSerializer(serializers.ModelSerializer):
 
 class ContentSerializer(serializers.ModelSerializer):
     '''Сериализатор для модели "Контент".'''
+    merchStatus = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Content
-        fields = ('id', 'link',)
+        fields = ('id', 'link', 'merchStatus')
+
+    def get_merchStatus(self, obj):
+        content_type_title = obj.content_type.title.lower()
+        if content_type_title == 'после гайда':
+            merch_for_send = obj.merch_for_send.first()
+            if merch_for_send:
+                return merch_for_send.shipped
+        return None
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        content_type_title = instance.content_type.title.lower()
+        if content_type_title != 'после гайда':
+            data.pop('merchStatus', None)
+        return data
 
 
 class ContentTypeSerializer(serializers.ModelSerializer):
