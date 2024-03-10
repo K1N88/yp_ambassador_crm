@@ -2,9 +2,9 @@ version: '3.9'
 
 services:
   frontend:
-    image: k1n8/crm_app_frontend:latest
+    image: k1n8/crm_app:latest
     volumes:
-      - ../frontend/:/app/result_build/
+      - ../frontend/:/frontend/result_build/
 
   db:
     image: postgres:15.3-alpine
