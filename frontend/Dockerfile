@@ -1,5 +1,3 @@
-# build env
-# FROM node:20.7 as build
 FROM node:20.7
 WORKDIR /app
 COPY package*.json ./
