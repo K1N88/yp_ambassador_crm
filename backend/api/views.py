@@ -1,8 +1,9 @@
 import xlwt
 import logging
 import pandas as pd
+from xlwt import easyxf
 
-from django.db.models import Count, Max
+from django.db.models import Count, Max, Sum
 from django.http import HttpResponse, JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -12,7 +13,7 @@ from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
-from api.filters import AmbassadorsFilter
+from api.filters import AmbassadorsFilter, BudgetFilter
 from api.serializers import (AmbassadorPostSerializer, AmbassadorSerializer,
                              AmbassadorUpdateSerializer, BudgetSerializer,
                              ContentListSerializer, ContentPostSerializer,
@@ -157,38 +158,83 @@ class BudgetViewSet(
 ):
     queryset = Budget.objects.all()
     serializer_class = BudgetSerializer
+    filterset_class = BudgetFilter
+    filterset_fields = ['study_programm', 'status', 'gender', 'name', 'date_shipping_from',
+                        'date_shipping_to', 'city', 'date_from', 'date_to', 'merch']
+
+    def get_queryset(self):
+        queryset = Budget.objects.all()
+
+        filterset = self.filterset_class(data=self.request.GET, queryset=queryset)
+        queryset = filterset.qs
+
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        total_spending = queryset.aggregate(total_spending=Sum('merch__merch__cost'))
+
+        serializer = self.get_serializer(queryset, many=True)
+        response_data = {"total_spending": total_spending['total_spending'], "results": serializer.data}
+        
+        return Response(response_data)
 
     @action(detail=False, methods=['get'])
     def excel(self, request):
-        response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="budget.xls"'
+            response = HttpResponse(content_type='application/ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="budget.xls"'
 
-        wb = xlwt.Workbook(encoding='utf-8')
-        ws = wb.add_sheet('Budget')
+            wb = xlwt.Workbook(encoding='utf-8')
+            ws = wb.add_sheet('Budget')
 
-        row_num = 0
+            row_num = 0
 
-        font_style = xlwt.XFStyle()
-        font_style.font.bold = True
+            font_style = xlwt.XFStyle()
+            font_style.font.bold = True
 
-        columns = ['Имя', 'Дата отправки', 'Тип мерча', 'Стоимость', ]
+            columns = ['Имя', 'Дата отправки', 'Тип мерча', 'Стоимость']
 
-        for col_num in range(len(columns)):
-            ws.write(row_num, col_num, columns[col_num], font_style)
+            borders = xlwt.Borders()
+            borders.left = xlwt.Borders.THIN
+            borders.right = xlwt.Borders.THIN
+            borders.top = xlwt.Borders.THIN
+            borders.bottom = xlwt.Borders.THIN
 
-        font_style = xlwt.XFStyle()
+            align_center = xlwt.Alignment()
+            align_center.horz = xlwt.Alignment.HORZ_CENTER
 
-        rows = Budget.objects.all().values_list(
-            'ambassador__name', 'merch__date', 'merch__merch__name',
-            'merch__merch__cost'
-        )
-        for row in rows:
-            row_num += 1
-            for col_num in range(len(row)):
-                ws.write(row_num, col_num, row[col_num], font_style)
+            style_center = xlwt.XFStyle()
+            style_center.alignment = align_center
+            style_center.borders = borders
 
-        wb.save(response)
-        return response
+            for col_num in range(len(columns)):
+                ws.write(row_num, col_num, columns[col_num], style_center)
+
+            font_style = xlwt.XFStyle()
+
+            date_style = easyxf('font: bold off; pattern: pattern solid, fore_colour white; '
+                                'borders: left thin, right thin, top thin, bottom thin;')
+            date_style.num_format_str = 'DD.MM.YYYY'
+
+            total_cost = 0
+
+            rows = Budget.objects.all().values_list(
+                'ambassador__name', 'merch__date', 'merch__merch__name', 'merch__merch__cost'
+            )
+            for row in rows:
+                row_num += 1
+                for col_num in range(len(row)):
+                    if col_num == 1:
+                        ws.write(row_num, col_num, row[col_num], date_style)
+                    else:
+                        ws.write(row_num, col_num, row[col_num], style_center)
+                total_cost += row[3]
+
+            ws.write(row_num+1, 3, 'Итог:', font_style)
+            ws.write(row_num+1, 4, total_cost, font_style)
+
+            wb.save(response)
+            return response
 
 
 class ContentViewSet(

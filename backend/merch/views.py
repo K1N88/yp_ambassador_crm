@@ -1,4 +1,5 @@
 import xlwt
+from xlwt import easyxf
 
 from django.http import HttpResponse
 from rest_framework import mixins, viewsets, status
@@ -33,8 +34,15 @@ class MerchandiseView(viewsets.GenericViewSet, mixins.ListModelMixin):
         font_style = xlwt.XFStyle()
         font_style.font.bold = True
 
-        columns = ['Имя', 'Тип мерча', 'Комментарий', 'Дата отправки',
-                   'Статус']
+        borders = xlwt.Borders()
+        borders.bottom = xlwt.Borders.THIN
+        font_style.borders = borders
+
+        alignment = xlwt.Alignment()
+        alignment.horz = xlwt.Alignment.HORZ_CENTER
+        font_style.alignment = alignment
+
+        columns = ['Имя', 'Тип мерча', 'Комментарий', 'Дата отправки', 'Статус']
 
         for col_num in range(len(columns)):
             ws.write(row_num, col_num, columns[col_num], font_style)
@@ -44,10 +52,24 @@ class MerchandiseView(viewsets.GenericViewSet, mixins.ListModelMixin):
         rows = MerchForSend.objects.all().values_list(
             'ambassador__name', 'merch__name', 'comment', 'date', 'shipped'
         )
+        date_style = easyxf('font: bold off; pattern: pattern solid, fore_colour white; '
+                            'borders: left thin, right thin, top thin, bottom thin;')
+        date_style.num_format_str = 'DD.MM.YYYY'
+
         for row in rows:
             row_num += 1
             for col_num in range(len(row)):
-                ws.write(row_num, col_num, row[col_num], font_style)
+                cell_style = xlwt.XFStyle()
+                cell_style.borders = borders
+                cell_style.alignment = alignment
+
+                if col_num == 3:
+                    ws.write(row_num, col_num, row[col_num], date_style)
+                elif col_num == 4:
+                    status = 'Отправлен' if row[col_num] else 'Не отправлен'
+                    ws.write(row_num, col_num, status, cell_style)
+                else:
+                    ws.write(row_num, col_num, row[col_num], cell_style)
 
         wb.save(response)
         return response

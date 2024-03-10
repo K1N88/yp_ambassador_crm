@@ -9,8 +9,8 @@ router = DefaultRouter()
 
 router.register(r'ambassadors', AmbassadorsViewSet, basename='ambassadors')
 router.register(r'budget', BudgetViewSet, basename='budget')
-router.register(r'supervisors', SupervisorViewSet)
-router.register(r'study_programms', StudyProgrammViewSet)
+router.register(r'supervisors', SupervisorViewSet, basename='supervisors')
+router.register(r'study_programms', StudyProgrammViewSet, basename='study_programms')
 router.register(r'merchandise', MerchandiseView, basename='merchandises')
 router.register(r'content', ContentViewSet, basename='content')
 
@@ -19,7 +19,7 @@ urlpatterns = [
     path('', include('djoser.urls')),
     path('api/ambassadors/import/', import_ambassadors,
          name='import_ambassadors'),
-    path('api/ambassadors/<int:ambassadorId>/merchandise/<int:merchandiseId>/state',  # noqa
+    path('api/ambassadors/<int:ambassadorId>/merchandise/<int:merchandiseId>/state/',  # noqa
          SetStatusView.as_view(), name='setstatus'),
     path('api/', include(router.urls)),
 ]

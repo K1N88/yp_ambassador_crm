@@ -20,7 +20,7 @@ class TestAmbassadorsSerializers():
             "surname": "Пупкин",
             "name": "Василий",
             "patronymic": "Васильевич",
-            "gender": "М",
+            "gender": "Мужской",
             "study_programm": 1,
             "country": "Россия",
             "city": "Москва",
@@ -52,7 +52,7 @@ class TestAmbassadorsSerializers():
             "surname": "Вупкин",
             "name": "Пасилий",
             "patronymic": "Пасильевич",
-            "gender": "М",
+            "gender": "Мужской",
             "country": "Россия",
             "city": "Москва",
             "address": "Пушкина, дом Колотушкина",
@@ -81,7 +81,7 @@ class TestAmbassadorsSerializers():
             "surname": "Пупкин",
             "name": "Василий",
             "patronymic": "Васильевич",
-            "gender": "М",
+            "gender": "Мужской",
             "country": "Россия",
             "city": "Москва",
             "address": "Пушкина, дом Колотушкина",
@@ -117,28 +117,28 @@ class TestAmbassadorsSerializers():
         ambassador_2_data["study_programm"] = 2
 
         expected_structure = [
-            OrderedDict(
-                [('id', 1), ('date_created', '2024-03-09'), ('surname', 'Вупкин'),
-                 ('name', 'Пасилий'), ('patronymic', 'Пасильевич'), ('gender', 'М'),
-                 ('country', 'Россия'), ('city', 'Москва'), ('address', 'Пушкина, дом Колотушкина'),
-                 ('zip_code', '153024'), ('email', 'pasiliy@example.com'), ('phone', '88005553523'),
-                 ('telegram_handle', 'https://t.me/pasya'), ('education', 'Академия джедаев'),
-                 ('job', 'Джедай'), ('aim', 'Стать ситхом'), ('want_to_do', 'Ничего не хочу'),
-                 ('blog_url', None), ('shirt_size', 'M'), ('shoes_size', 42), ('comment', None),
-                 ('promocode', None), ('status', None), ('supervisor_comment', None),
-                 ('contact_preferences', None), ('study_programm', 1), ('supervisor', None)]
-                ),
-            OrderedDict(
-                [('id', 2), ('date_created', '2024-03-09'), ('surname', 'Пупкин'),
-                 ('name', 'Василий'), ('patronymic', 'Васильевич'), ('gender', 'М'),
-                 ('country', 'Россия'), ('city', 'Москва'), ('address', 'Пушкина, дом Колотушкина'),
-                 ('zip_code', '153000'), ('email', 'vasiliy@example.com'), ('phone', '88005553535'),
-                 ('telegram_handle', 'https://t.me/vasya'), ('education', 'Академия джедаев'),
-                 ('job', 'Джедай'), ('aim', 'Стать ситхом'), ('want_to_do', 'Ничего не хочу'),
-                 ('blog_url', None), ('shirt_size', 'M'), ('shoes_size', 42), ('comment', None),
-                 ('promocode', None), ('status', None), ('supervisor_comment', None),
-                 ('contact_preferences', None), ('study_programm', 1), ('supervisor', None)]
-                )
+            OrderedDict([('id', 1), ('study_programm', OrderedDict([('id', 1),
+                        ('title', 'Python-разработчик')])), ('date_created', '2024-03-09'),
+                        ('surname', 'Вупкин'), ('name', 'Пасилий'), ('patronymic', 'Пасильевич'),
+                        ('gender', 'Мужской'), ('country', 'Россия'), ('city', 'Москва'),
+                        ('address', 'Пушкина, дом Колотушкина'), ('zip_code', '153024'),
+                        ('email', 'pasiliy@example.com'), ('phone', '88005553523'),
+                        ('telegram_handle', 'https://t.me/pasya'), ('education', 'Академия джедаев'),
+                        ('job', 'Джедай'), ('aim', 'Стать ситхом'), ('want_to_do', 'Ничего не хочу'),
+                        ('blog_url', None), ('shirt_size', 'M'), ('shoes_size', 42), ('comment', None),
+                        ('promocode', None), ('status', None), ('supervisor_comment', None),
+                        ('contact_preferences', None), ('supervisor', None)]),
+            OrderedDict([('id', 2), ('study_programm', OrderedDict([('id', 1),
+                        ('title', 'Python-разработчик')])), ('date_created', '2024-03-09'),
+                        ('surname', 'Пупкин'), ('name', 'Василий'), ('patronymic', 'Васильевич'),
+                        ('gender', 'Мужской'), ('country', 'Россия'), ('city', 'Москва'),
+                        ('address', 'Пушкина, дом Колотушкина'), ('zip_code', '153000'),
+                        ('email', 'vasiliy@example.com'), ('phone', '88005553535'),
+                        ('telegram_handle', 'https://t.me/vasya'), ('education', 'Академия джедаев'),
+                        ('job', 'Джедай'), ('aim', 'Стать ситхом'), ('want_to_do', 'Ничего не хочу'),
+                        ('blog_url', None), ('shirt_size', 'M'), ('shoes_size', 42), ('comment', None),
+                        ('promocode', None), ('status', None), ('supervisor_comment', None),
+                        ('contact_preferences', None), ('supervisor', None)])
             ]
 
         assert serialized_data == expected_structure, (

@@ -11,7 +11,7 @@ AMBASSADOR_DATA = {
         'surname': 'Пупкин',
         'name': 'Василий',
         'patronymic': 'Васильевич',
-        'gender': 'М',
+        'gender': 'Мужской',
         'study_programm': None,
         'country': 'Россия',
         'city': 'Москва',

@@ -52,8 +52,8 @@ class SupervisorSerializer(serializers.ModelSerializer):
 
 
 class BudgetSerializer(serializers.Serializer):
-    ambassadorName = serializers.CharField(
-        source='ambassador.name', read_only=True
+    ambassadorName = serializers.SerializerMethodField(
+        read_only=True
     )
     period = serializers.DateField(
         source='merch.date', read_only=True
@@ -69,6 +69,10 @@ class BudgetSerializer(serializers.Serializer):
     class Meta:
         model = Budget
         fields = ('ambassadorName', 'period', 'style', 'price', 'sum')
+
+    def get_ambassadorName(self, obj):
+        ambassador = obj.ambassador
+        return ambassador.full_name
 
     def get_sum(self, obj):
         merch_for_send = MerchForSend.objects.filter(ambassador=obj.ambassador)
