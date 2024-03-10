@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.db.models import Count, Sum
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from ambassadors.models import Ambassadors, Content, ContentType, StudyProgramm
@@ -137,7 +136,7 @@ class ContentTypeSerializer(serializers.ModelSerializer):
 
 
 class ContentListSerializer(serializers.ModelSerializer):
-    ''''Сериализатор для модели "Контент" запроса GET(list).'''
+    '''Сериализатор для модели "Контент" запроса GET(list).'''
 
     ambassadorName = serializers.SerializerMethodField(read_only=True)
     telegramHandle = serializers.CharField(
@@ -149,7 +148,7 @@ class ContentListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ambassadors
-        fields = ('ambassadorName', 'telegramHandle', 'contentTypes',)
+        fields = ('ambassadorName', 'telegramHandle', 'contentTypes')
 
     def get_ambassadorName(self, obj):
         return obj.full_name
