@@ -2,7 +2,6 @@
 
 Инфраструктура управления сообществом Амбассадоры Практикума
 
-
 ## ссылка на Swagger
 
 [http://89.111.174.233/swagger](http://89.111.174.233/swagger)
@@ -30,12 +29,13 @@ sudo docker-compose up -d --build
 - открываем главную страницу [http://89.111.174.233/](http://89.111.174.233/)
 
 ## :hammer_and_wrench: Основные технологии и библиотеки :
-Python 3.10
-Django 4.2.5
-djangorestframework 3.14
-djoser
-gunicorn
-nginx
+
+- Python 3.10
+- Django 4.2.5
+- djangorestframework 3.14
+- djoser
+- gunicorn
+- nginx
 
 ## :juggling_person: Над проектом работали :
 
