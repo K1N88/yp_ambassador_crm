@@ -34,6 +34,7 @@ jobs:
 
   build_and_push_to_docker_hub2:
     runs-on: ubuntu-latest
+    needs: build_and_push_to_docker_hub
     steps:
     - name: Check out the repo
       uses: actions/checkout@v2
@@ -57,7 +58,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build_and_push_to_docker_hub
+    needs: build_and_push_to_docker_hub2
     steps:
     - name: executing remote ssh commands to deploy
       uses: appleboy/ssh-action@master
