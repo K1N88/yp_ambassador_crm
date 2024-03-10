@@ -16,7 +16,6 @@ git@github.com:K1N88/yp_ambassador_crm.git
 - скачиваем образы с Docker Hub
 ```
 sudo docker pull k1n8/crm_app:latest
-sudo docker pull k1n8/crm_app_frontend:latest
 ```
 - переходим в папку infra/
 ```
