@@ -4,5 +4,5 @@ RUN pip install poetry
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-dev
 COPY backend/ .
-COPY frontend/ ./app_frontend/
+COPY app_frontend/ ./app_frontend/
 CMD ["poetry", "run", "gunicorn", "backend.wsgi:application", "--bind", "0:8000"]
